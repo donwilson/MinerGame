@@ -13,11 +13,13 @@
 <body>
 	<script type="text/javascript" src="/static/js/game/init.js"></script>
 	
-	<script type="text/javascript" src="/static/js/game/data/characters.js"></script>
 	<script type="text/javascript" src="/static/js/game/data/tile_types.js"></script>
+	
+	<script type="text/javascript" src="/static/js/game/component/BackpackComponent.js"></script>
 	
 	<script type="text/javascript" src="/static/js/game/entity/WorldEntity.js"></script>
 	<script type="text/javascript" src="/static/js/game/entity/TileEntity.js"></script>
+	<script type="text/javascript" src="/static/js/game/entity/PlayerEntity.js"></script>
 	
 	<script type="text/javascript" src="/static/js/game/state/BootState.js"></script>
 	<script type="text/javascript" src="/static/js/game/state/PreloaderState.js"></script>
