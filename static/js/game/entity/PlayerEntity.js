@@ -16,7 +16,7 @@
 		// animations
 		for(var key in this.character.animations) {
 			if(this.character.animations.hasOwnProperty(key)) {
-				this.animations.add(key, this.character.animations[ key ], 10, true);
+				this.animations.add(key, this.character.animations[ key ].frames, this.character.animations[ key ].speed, true);
 			}
 		}
 		
@@ -50,10 +50,12 @@
 	MinerGame.Entity.Player.prototype.constructor = MinerGame.Entity.Player;
 	
 	MinerGame.Entity.Player.prototype.update = function() {
-		var player_jump_amount = (TILE_HEIGHT * 9.8);
+		var is_fast = this.wasd.shift.isDown;
+		
+		var player_jump_amount = (TILE_HEIGHT * 6.5);
 		var player_speed = (TILE_WIDTH * 4);
 		
-		if(this.wasd.shift.isDown) {
+		if(is_fast) {
 			player_speed = (TILE_WIDTH * 18);
 		}
 		
@@ -63,24 +65,28 @@
 		var running_right = this.cursors.right.isDown || this.wasd.right.isDown || false;
 		
 		if(do_jump && is_standing) {
-			this.body.velocity.y = -210;
+			this.body.velocity.y = -player_jump_amount;
 		}
 		
 		if(running_left && !running_right) {
 			this.body.velocity.x = -player_speed;
 			
-			if(do_jump && is_standing) {
+			if(do_jump || !is_standing) {
 				this.animations.play('stand_left');
-			} else {
+			} else if(is_fast) {
 				this.animations.play('run_left');
+			} else {
+				this.animations.play('walk_left');
 			}
 		} else if(running_right && !running_left) {
 			this.body.velocity.x = player_speed;
 			
-			if(do_jump && is_standing) {
+			if(do_jump || !is_standing) {
 				this.animations.play('stand_right');
-			} else {
+			} else if(is_fast) {
 				this.animations.play('run_right');
+			} else {
+				this.animations.play('walk_right');
 			}
 		} else {
 			// standing still
@@ -103,10 +109,30 @@
 				},
 				'default_frame': 0,
 				'animations': {
-					'stand_left': [9],
-					'run_left': [10, 11],
-					'stand_right': [18],
-					'run_right': [19, 20]
+					'stand_left': {
+						'frames': [9],
+						'speed': 10
+					},
+					'walk_left': {
+						'frames': [10, 11],
+						'speed': 5
+					},
+					'run_left': {
+						'frames': [10, 11],
+						'speed': 10
+					},
+					'stand_right': {
+						'frames': [18],
+						'speed': 10
+					},
+					'walk_right': {
+						'frames': [19, 20],
+						'speed': 5
+					},
+					'run_right': {
+						'frames': [19, 20],
+						'speed': 10
+					}
 				},
 				'properties': {
 					'reach': 5
@@ -122,10 +148,30 @@
 				},
 				'default_frame': 3,
 				'animations': {
-					'stand_left': [12],
-					'run_left': [13, 14],
-					'stand_right': [21],
-					'run_right': [22, 23]
+					'stand_left': {
+						'frames': [12],
+						'speed': 10
+					},
+					'walk_left': {
+						'frames': [13, 14],
+						'speed': 5
+					},
+					'run_left': {
+						'frames': [13, 14],
+						'speed': 10
+					},
+					'stand_right': {
+						'frames': [21],
+						'speed': 10
+					},
+					'walk_right': {
+						'frames': [22, 23],
+						'speed': 5
+					},
+					'run_right': {
+						'frames': [22, 23],
+						'speed': 10
+					}
 				},
 				'properties': {
 					'reach': 5
@@ -141,10 +187,30 @@
 				},
 				'default_frame': 6,
 				'animations': {
-					'stand_left': [15],
-					'run_left': [16, 17],
-					'stand_right': [24],
-					'run_right': [25, 26]
+					'stand_left': {
+						'frames': [15],
+						'speed': 10
+					},
+					'walk_left': {
+						'frames': [16, 17],
+						'speed': 5
+					},
+					'run_left': {
+						'frames': [16, 17],
+						'speed': 10
+					},
+					'stand_right': {
+						'frames': [24],
+						'speed': 10
+					},
+					'walk_right': {
+						'frames': [25, 26],
+						'speed': 5
+					},
+					'run_right': {
+						'frames': [25, 26],
+						'speed': 10
+					}
 				},
 				'properties': {
 					'reach': 5

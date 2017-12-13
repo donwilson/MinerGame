@@ -9,11 +9,12 @@
 		
 		this.fullscreenButton = null;
 		
+		this.background = null;
 		this.player = null;
 		this.backpack = null;
 		
 		this.marker = null;
-		this.currentDataString = null;
+		this.currentDataString = "";
 		
 		Phaser.State.call(this);
 	};
@@ -22,6 +23,10 @@
 	MinerGame.State.Game.prototype.constructor = MinerGame.State.Game;
 	
 	MinerGame.State.Game.prototype.create = function() {
+		// background
+		this.background = this.game.add.image(0, 0, 'background');
+		this.background.fixedToCamera = true;
+		
 		// arcade physics
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		
@@ -117,7 +122,7 @@
 		var tile = this.custWorld.getTile(x, y);
 		
 		if((distance_from_player <= max_distance) && (distance_from_player > 0.5)) {
-			this.currentDataString = "";
+			//this.currentDataString = "";
 			
 			var new_tile_type = "";
 			
@@ -131,11 +136,11 @@
 				this.backpack.addItem(tile.type);
 				this.custWorld.replaceTile(x, y, new_tile_type);
 				
-				this.currentDataString = "replaced "+ tile.type +" with "+ new_tile_type +" at "+ x +","+ y;
+				//this.currentDataString = "replaced "+ tile.type +" with "+ new_tile_type +" at "+ x +","+ y;
 			}
 		} else {
 			// just show tile info since player can't interact this far away
-			this.currentDataString = x +","+ y +" ("+ tile.type +"): "+ JSON.stringify( tile.properties );
+			//this.currentDataString = x +","+ y +" ("+ tile.type +"): "+ JSON.stringify( tile.properties );
 		}
 	};
 	

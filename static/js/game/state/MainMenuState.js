@@ -16,7 +16,7 @@
 	};
 	
 	MinerGame.State.MainMenu.prototype.preload = function() {
-		//game.load.image('button_start', "/static/images/button_start.png");
+		//game.load.image('button_start', "static/images/button_start.png");
 	};
 	
 	MinerGame.State.MainMenu.prototype.create = function() {
