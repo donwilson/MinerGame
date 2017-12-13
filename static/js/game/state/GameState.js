@@ -133,7 +133,7 @@
 			}
 			
 			if("" !== new_tile_type) {
-				this.backpack.addItem(tile.type);
+				this.backpack.addItem(tile);
 				this.custWorld.replaceTile(x, y, new_tile_type);
 				
 				//this.currentDataString = "replaced "+ tile.type +" with "+ new_tile_type +" at "+ x +","+ y;
