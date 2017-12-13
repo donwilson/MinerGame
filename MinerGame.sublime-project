@@ -1,0 +1,26 @@
+{
+	"folders":
+	[
+		{
+			"name": "MinerGame",
+			"path": "static/js/game/",
+			"file_exclude_patterns": [
+				"*.*CST"
+			]
+		},
+		{
+			"name": "Images",
+			"path": "static/images/",
+			"file_exclude_patterns": [
+				"*.*CST"
+			]
+		},
+		{
+			"name": "Frontend",
+			"path": ".",
+			"file_exclude_patterns": [
+				"*.*CST"
+			]
+		}
+	]
+}
