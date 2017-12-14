@@ -69,8 +69,12 @@
 		this.game.physics.arcade.gravity.y = (TILE_HEIGHT * 9.8);
 		
 		// input callbacks
-		this.game.input.addMoveCallback(this.updateMarker, this);
-		this.game.input.onDown.add(this.clickTile, this);
+		this.game.input.addMoveCallback(this.handleMouseMove, this);
+		this.game.input.onDown.add(this.handleClick, this);
+		//this.game.input.mouse.capture = true;   // prevent scrolling the window ["If true the DOM mouse events will have event.preventDefault applied to them, if false they will propagate fully."]
+		
+		// mouseWheelCallback doesn't keep instance context, so make self reference
+		this.game.input.mouse.mouseWheelCallback = this.GameHandleMouseWheel(this);
 	};
 	
 	MinerGame.State.Game.prototype.update = function() {
@@ -87,7 +91,8 @@
 		}
 	};
 	
-	MinerGame.State.Game.prototype.updateMarker = function() {
+	// mouse move
+	MinerGame.State.Game.prototype.handleMouseMove = function() {
 		var marker_tile_x = this.layer.getTileX(this.game.input.activePointer.worldX);
 		var marker_tile_y = this.layer.getTileY(this.game.input.activePointer.worldY);
 		
@@ -105,8 +110,8 @@
 		this.marker.alpha = marker_alpha;
 	};
 	
-	// tile properties
-	MinerGame.State.Game.prototype.clickTile = function() {
+	// mouse click
+	MinerGame.State.Game.prototype.handleClick = function() {
 		var x = this.layer.getTileX(this.game.input.activePointer.worldX);
 		var y = this.layer.getTileY(this.game.input.activePointer.worldY);
 		
@@ -122,10 +127,9 @@
 		var tile = this.custWorld.getTile(x, y);
 		
 		if((distance_from_player <= max_distance) && (distance_from_player > 0.5)) {
-			//this.currentDataString = "";
-			
 			var new_tile_type = "";
 			
+			// this is where the game can decide to pick item up or place an item
 			if("air" != tile.type) {
 				new_tile_type = "air";
 			} else {
@@ -135,12 +139,15 @@
 			if("" !== new_tile_type) {
 				this.backpack.addItem(tile);
 				this.custWorld.replaceTile(x, y, new_tile_type);
-				
-				//this.currentDataString = "replaced "+ tile.type +" with "+ new_tile_type +" at "+ x +","+ y;
 			}
-		} else {
-			// just show tile info since player can't interact this far away
-			//this.currentDataString = x +","+ y +" ("+ tile.type +"): "+ JSON.stringify( tile.properties );
 		}
+	};
+	
+	// mouse wheel
+	MinerGame.State.Game.prototype.GameHandleMouseWheel = function(context) {
+		return function() {
+			// backpack scroll
+			context.backpack.handleMouseWheel();
+		};
 	};
 	
