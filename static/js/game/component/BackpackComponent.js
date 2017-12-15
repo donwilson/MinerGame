@@ -30,7 +30,7 @@
 		this.box_slot_selected_border_alpha = 0.5;
 		
 		this.create();
-	}
+	};
 	
 	MinerGame.Component.Backpack.prototype = Object.create(Phaser.Component.prototype);
 	MinerGame.Component.Backpack.prototype.constructor = MinerGame.Component.Backpack;
