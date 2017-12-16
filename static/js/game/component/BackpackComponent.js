@@ -144,8 +144,6 @@
 		}
 		
 		this.updateItemBoxes();
-		
-		console.dir(this.inventory);
 	};
 	
 	MinerGame.Component.Backpack.prototype.updateItemBoxes = function() {
@@ -201,8 +199,6 @@
 	
 	MinerGame.Component.Backpack.prototype.handleMouseWheel = function() {
 		var new_selected_slot = this.selected_slot;
-		
-		console.log(this.game.input.mouse);
 		
 		if(this.game.input.mouse.wheelDelta == -1) {
 			// wheel scrolled down, scroll right in inventory

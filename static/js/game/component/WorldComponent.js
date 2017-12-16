@@ -21,11 +21,8 @@
 	
 	MinerGame.Component.World.prototype.create = function() {
 		// create world
-		this.generate_addAir();
-		this.generate_addDirt();
-		this.generate_addStone();
-		this.generate_addWood();
-		this.generate_addOre();
+		this.generate_randomWorld();
+		this.generate_addSky();
 		this.generate_addLava();
 		
 		// add world data to game cache
@@ -74,60 +71,156 @@
 		//this.updateCollision();
 	}
 	
-	MinerGame.Component.World.prototype.generate_addAir = function() {
+	MinerGame.Component.World.prototype.generate_randomWorld = function() {
+		var x, y;
+		
+		// start instance tile array
+		for(y = 0; y < this.height; y++) {
+			this.tiles[ y ] = [];
+		}
+		
+		// generate full map of dirt
+		for(y = 0; y < this.height; y++) {
+			for(x = 0; x < this.width; x++) {
+				this.placeTile(x, y, 'dirt');
+			}
+		}
+		
+		this.generate_random_stone();
+		//this.generate_random_ore();
+		this.generate_random_caverns();
+	};
+	
+	MinerGame.Component.World.prototype.generate_random_stone = function() {
+		var perlin = new PerlinNoise(),
+			px, px, pnoise,
+			pz,
+			pscale,
+			pnoise_round;
+		
+		// SETTINGS
+		//pz = this.game.rnd.between(0.4, 0.6);
+		pz = (Math.random() * 10);//pz = 0;
+		pscale = (this.width / TILE_WIDTH);
+		
+		// perlin map generator
+		var perlin_tile_type;
+		var cutoff = this.game.rnd.between(42, 46);
+		
+		// stone and ore
+		for(y = 0; y < this.height; y++) {
+			for(x = 0; x < this.width; x++) {
+				//px = (x / this.width);
+				//py = (y / this.height);
+				px = (x / TILE_WIDTH);
+				py = (y / TILE_HEIGHT);
+				
+				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				
+				pnoise_round = Math.round( (pnoise * 100) );
+				
+				perlin_tile_type = "";
+				
+				if(pnoise_round < cutoff) {
+					perlin_tile_type = "stone";
+				}
+				
+				if("" !== perlin_tile_type) {
+					this.placeTile(x, y, perlin_tile_type);
+				}
+			}
+		}
+	};
+	
+	MinerGame.Component.World.prototype.generate_random_ore = function() {
+		var perlin = new PerlinNoise(),
+			num_x = this.width,
+			num_y = this.height,
+			x, y,
+			px, px, pnoise,
+			pz,
+			pscale,
+			pnoise_round;
+		
+		// SETTINGS
+		pz = this.game.rnd.between(0.3, 0.5);
+		pscale = 1;//pscale = this.game.rnd.between(3, 10);
+		
+		// perlin map generator
+		var perlin_tile_type;
+		
+		// stone and ore
+		for(y = 0; y < this.height; y++) {
+			for(x = 0; x < this.width; x++) {
+				px = (x / this.width);
+				py = (y / this.height);
+				
+				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				
+				pnoise_round = Math.round( (pnoise * 100) );
+				
+				perlin_tile_type = "";
+				
+				if(pnoise_round >= 80) {
+					perlin_tile_type = "ore";
+				}
+				
+				if("" !== perlin_tile_type) {
+					this.placeTile(x, y, perlin_tile_type);
+				}
+			}
+		}
+	};
+	
+	MinerGame.Component.World.prototype.generate_random_caverns = function() {
+		var perlin = new PerlinNoise(),
+			px, px, pnoise,
+			pz,
+			pscale,
+			pnoise_round;
+		
+		// SETTINGS
+		pz = (Math.random() * 10);//pz = 0;
+		pscale = (this.width / TILE_WIDTH);
+		
+		// perlin map generator
+		var perlin_tile_type;
+		var cutoff = this.game.rnd.between(28, 33);
+		
+		// stone and ore
+		for(y = 0; y < this.height; y++) {
+			for(x = 0; x < this.width; x++) {
+				px = (x / TILE_WIDTH);
+				py = (y / TILE_HEIGHT);
+				
+				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				
+				pnoise_round = Math.round( (pnoise * 100) );
+				
+				perlin_tile_type = "";
+				
+				if(pnoise_round < cutoff) {
+					perlin_tile_type = "air";
+				}
+				
+				if("" !== perlin_tile_type) {
+					this.placeTile(x, y, perlin_tile_type);
+				}
+			}
+		}
+	};
+	
+	MinerGame.Component.World.prototype.generate_addSky = function() {
 		// start world creation by filling entire world with air
 		var y, x;
 		
-		for(y = 0; y < this.height; y++) {
-			this.tiles[ y ] = [];
-			
+		for(y = 0; y < this.height_sky; y++) {
 			for(x = 0; x < this.width; x++) {
 				this.placeTile(x, y, 'air');
 			}
 		}
 	};
 	
-	MinerGame.Component.World.prototype.generate_addDirt = function() {
-		// add dirt to world
-		var y, x;
-		
-		for(y = this.height_sky; y < this.height; y++) {
-			for(x = 0; x < this.width; x++) {
-				this.placeTile(x, y, 'dirt');
-			}
-		}
-	};
-	
-	MinerGame.Component.World.prototype.generate_addStone = function() {
-		// add stone to world
-		var y_min = (this.height_sky + 5);
-		//var num_groups = game.rnd.between(6, 10);   // number of stone groups to make
-		var num_groups = Math.round(Math.sqrt( (this.width * this.height) ));   // number of stone groups to make
-		var i;
-		var center_x, center_y;
-		
-		for(i = 0; i < num_groups; i++) {
-			center_x = this.game.rnd.between(0, this.width);
-			center_y = this.game.rnd.between(y_min, this.height);
-			
-			
-			this.placeTile(center_x, (center_y - 1), 'stone');
-			this.placeTile((center_x - 1), center_y, 'stone');
-			this.placeTile(center_x, center_y, 'stone');
-			this.placeTile((center_x + 1), center_y, 'stone');
-			this.placeTile(center_x, (center_y + 1), 'stone');
-		}
-	};
-	
-	MinerGame.Component.World.prototype.generate_addWood = function() {
-		// add wood to world
-		
-	};
-	
-	MinerGame.Component.World.prototype.generate_addOre = function() {
-		// add ore to world
-		
-	};
 	
 	MinerGame.Component.World.prototype.generate_addLava = function() {
 		// add lava to world
