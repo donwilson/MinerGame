@@ -1,6 +1,6 @@
 var tile_types = {
 	'air': {
-		'sprites': [16],
+		'sprites': [40],
 		'collide': false,
 		'properties': {
 			'title': "Air",
@@ -8,7 +8,7 @@ var tile_types = {
 		}
 	},
 	'dirt': {
-		'sprites': [80, 81, 82, 83, 84, 85, 86, 87],
+		'sprites': [200, 201, 203, 204, 205, 206, 207],
 		'collide': true,
 		'properties': {
 			'title': "Dirt",
@@ -16,23 +16,15 @@ var tile_types = {
 		}
 	},
 	'stone': {
-		'sprites': [32, 33, 34, 35, 36, 37, 38, 39],
+		'sprites': [80, 81, 82, 83, 84, 85, 86, 87],
 		'collide': true,
 		'properties': {
 			'title': "Stone",
 			'strength': 3
 		}
 	},
-	'wood': {
-		'sprites': [1024, 1025, 1026, 1027],
-		'collide': true,
-		'properties': {
-			'title': "Wood",
-			'strength': 3
-		}
-	},
 	'ore': {
-		'sprites': [672, 673, 674, 675],
+		'sprites': [2640, 2641, 2642, 2643],
 		'collide': true,
 		'properties': {
 			'title': "Ore",
@@ -40,7 +32,7 @@ var tile_types = {
 		}
 	},
 	'lava': {
-		'sprites': [448, 449, 450, 451],
+		'sprites': [1120, 1121, 1122, 1123],
 		'collide': true,
 		'properties': {
 			'title': "Lava",

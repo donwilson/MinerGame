@@ -6,6 +6,8 @@
 		this.game = game;
 		this.custWorld = custWorld;
 		
+		this.bounds = null;
+		
 		this.inventory = [];
 		
 		this.box_slots = [];
@@ -53,14 +55,14 @@
 		for(i = 0; i < this.num_bottom_slots; i++) {
 			rect = this.getItemBoxRelativeRect(i);
 			
-			//this.box_slots[ i ] = this.game.add.sprite(0, 0, 'tiles', Phaser.ArrayUtils.getRandomItem(tile_types.air.sprites));
 			this.box_slots[ i ] = {
-				'sprite': this.game.add.sprite(0, 0, 'tiles', Phaser.ArrayUtils.getRandomItem(tile_types.air.sprites)),
+				'sprite': this.game.add.sprite(0, 0, 'world', Phaser.ArrayUtils.getRandomItem(tile_types.air.sprites)),
 				'type': "air",
 				'draw_text': this.game.add.text(0, 0, "", {
 					'font': "10px Verdana",
 					'fill': "#ffffff"
-				})
+				}),
+				'container': rect
 			}
 			
 			// align sprite
@@ -184,6 +186,8 @@
 			width,
 			height
 		);
+		
+		this.bounds = this.backpack_rect;
 	};
 	
 	MinerGame.Component.Backpack.prototype.getItemBoxRelativeRect = function(i) {
@@ -195,6 +199,45 @@
 			(this.box_slot_padding + TILE_WIDTH + this.box_slot_padding),
 			(this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding)
 		);
+	};
+	
+	MinerGame.Component.Backpack.prototype.setActiveItemSlot = function(index) {
+		this.selected_slot = index;
+		
+		if((this.selected_slot < 0) || (this.selected_slot >= this.box_slots.length)) {
+			// reset to 0 since outside of box_slots amount
+			this.selected_slot = 0;
+		}
+		
+		// redraw bottom inventory
+		this.draw();
+	};
+	
+	MinerGame.Component.Backpack.prototype.capturedClick = function(screenX, screenY) {
+		// check if click is inside backpack, if so do logic and capture (return true), otherwise release click (return false)
+		if(!this.backpack_rect.contains(screenX, screenY)) {
+			return false;
+		}
+		
+		// determine which box slot is clicked
+		var relativeX = (screenX - this.backpack_rect.topLeft.x);
+		var relativeY = (screenY - this.backpack_rect.topLeft.y);
+		var invIndex = null;
+		
+		_.each(this.box_slots, function(value, index) {
+			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
+			if((null === invIndex) && value.container.contains(relativeX, relativeY)) {
+				invIndex = index;
+			}
+		});
+		
+		if(null !== invIndex) {
+			this.setActiveItemSlot(invIndex);
+			
+			return true;
+		}
+		
+		return true;
 	};
 	
 	MinerGame.Component.Backpack.prototype.handleMouseWheel = function() {
@@ -217,8 +260,5 @@
 			new_selected_slot = 0;
 		}
 		
-		this.selected_slot = new_selected_slot;
-		
-		// redraw bottom inventory
-		this.draw();
+		this.setActiveItemSlot(new_selected_slot);
 	};

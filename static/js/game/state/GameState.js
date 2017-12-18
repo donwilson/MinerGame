@@ -12,7 +12,6 @@
 		this.backpack = null;
 		
 		this.marker = null;
-		this.currentDataString = "";
 		
 		Phaser.State.call(this);
 	};
@@ -40,18 +39,22 @@
 		this.player = new MinerGame.Entity.Player(this.game, this.custWorld);
 		
 		// backpack
-		this.backpack = new MinerGame.Component.Backpack(this.game, this.custWorld);
+		//this.backpack = new MinerGame.Component.Backpack(this.game, this.custWorld);
 		
 		// make camera follow player
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
 		
 		// enable gravity
-		this.game.physics.arcade.gravity.y = (TILE_HEIGHT * 9.8);
+		this.game.physics.arcade.gravity.y = (TILE_HEIGHT * 9.8 * 2);
 		
 		// input callbacks
 		this.game.input.addMoveCallback(this.handleMouseMove, this);
 		this.game.input.onDown.add(this.handleClick, this);
 		//this.game.input.mouse.capture = true;   // prevent scrolling the window ["If true the DOM mouse events will have event.preventDefault applied to them, if false they will propagate fully."]
+		this.game.canvas.oncontextmenu = function(e) {
+			// prevent right click contextmenu
+			e.preventDefault();
+		};
 		
 		// mouseWheelCallback doesn't keep instance context, so make self reference
 		this.game.input.mouse.mouseWheelCallback = this.GameHandleMouseWheel(this);
@@ -65,11 +68,10 @@
 	};
 	
 	MinerGame.State.Game.prototype.render = function() {
-		// marker info
-		if(this.currentDataString) {
-			this.game.debug.text(this.currentDataString, 16, 16);
-		}
+		
 	};
+	
+	
 	
 	// mouse move
 	MinerGame.State.Game.prototype.handleMouseMove = function() {
@@ -84,7 +86,7 @@
 		var marker_alpha = 1;
 		
 		if(distance_from_player > max_distance) {
-			marker_alpha = 0.2;
+			marker_alpha = 0;//marker_alpha = 0.2;
 		}
 		
 		this.marker.alpha = marker_alpha;
@@ -92,42 +94,39 @@
 	
 	// mouse click
 	MinerGame.State.Game.prototype.handleClick = function() {
-		var x = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
-		var y = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
-		
-		if((x < 0) || (x > this.custWorld.width) || (y < 0) || (y > this.custWorld.height)) {
-			this.currentDataString = "";
-			
+		if(!this.game.input.activePointer.withinGame) {
 			return;
 		}
 		
-		var distance_from_player = this.game.math.distance(this.custWorld.layer.getTileX(this.player.x), this.custWorld.layer.getTileY(this.player.y), x, y);
-		var max_distance = this.player.getReach();
+		var worldX = this.game.input.activePointer.worldX;
+		var worldY = this.game.input.activePointer.worldY;
 		
-		var tile = this.custWorld.getTile(x, y);
+		var screenX = (worldX - this.game.camera.view.topLeft.x);
+		var screenY = (worldY - this.game.camera.view.topLeft.y);
 		
-		if((distance_from_player <= max_distance) && (distance_from_player > 0.5)) {
-			var new_tile_type = "";
-			
-			// this is where the game can decide to pick item up or place an item
-			if("air" != tile.type) {
-				new_tile_type = "air";
-			} else {
-				//new_tile_type = "dirt";
-			}
-			
-			if("" !== new_tile_type) {
-				this.backpack.addItem(tile);
-				this.custWorld.replaceTile(x, y, new_tile_type);
-			}
+		// check if in backpack
+		if(true === this.player.backpack.capturedClick(screenX, screenY)) {
+			return;
 		}
+		
+		var tileX = this.custWorld.layer.getTileX(worldX);
+		var tileY = this.custWorld.layer.getTileY(worldY);
+		
+		if((tileX < 0) || (tileX > this.custWorld.width) || (tileY < 0) || (tileY > this.custWorld.height)) {
+			return;
+		}
+		
+		
+		// @TODO
+		// move following code into new PlayerEntity.hitTile(tileX, tileY)
+		this.player.hitTile(tileX, tileY);
 	};
 	
 	// mouse wheel
 	MinerGame.State.Game.prototype.GameHandleMouseWheel = function(context) {
 		return function() {
 			// backpack scroll
-			context.backpack.handleMouseWheel();
+			context.player.backpack.handleMouseWheel();
 		};
 	};
 	

@@ -3,13 +3,14 @@
 	MinerGame.Entity = window.MinerGame.Entity || (window.MinerGame.Entity = {});
 	
 	MinerGame.Entity.Player = function(game, custWorld) {
+		this.game = game;
 		this.custWorld = custWorld;
 		
 		this.character = this.pickCharacter();
 		this.spawn = this.custWorld.getSpawn();
+		this.backpack = new MinerGame.Component.Backpack(this.game, this.custWorld);
 		
-		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), 'players', this.character.default_frame);
-		//Phaser.Sprite.call(this, game, 0, 0, 'players');
+		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
 		
 		//this.character = playable_characters[ game.rnd.pick( _.keys(playable_characters) ) ];
 		
@@ -20,7 +21,7 @@
 			}
 		}
 		
-		// crop
+		// crop sprite to contain just image
 		this.maybeCrop();
 		
 		// physics
@@ -38,8 +39,7 @@
 			'left': this.game.input.keyboard.addKey(Phaser.Keyboard.A),
 			'down': this.game.input.keyboard.addKey(Phaser.Keyboard.S),
 			'right': this.game.input.keyboard.addKey(Phaser.Keyboard.D),
-			'jump': this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
-			'shift': this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT)
+			'jump': this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
 		};
 		
 		// add generated player to game
@@ -50,9 +50,9 @@
 	MinerGame.Entity.Player.prototype.constructor = MinerGame.Entity.Player;
 	
 	MinerGame.Entity.Player.prototype.update = function() {
-		var is_fast = this.wasd.shift.isDown;
+		var is_fast = false;//var is_fast = this.wasd.shift.isDown;
 		
-		var player_jump_amount = (TILE_HEIGHT * 6.5);
+		var player_jump_amount = (TILE_HEIGHT * 9);
 		var player_speed = (TILE_WIDTH * 4);
 		
 		if(is_fast) {
@@ -99,78 +99,78 @@
 	
 	MinerGame.Entity.Player.prototype.pickCharacter = function() {
 		var playable_characters = {
-			'man': {
-				'spritesheet': "players",
+			'boy': {
+				'spritesheet': "world",
 				'crop': {
 					'top': 0,
 					'right': 6,
 					'bottom': 0,
 					'left': 6
 				},
-				'default_frame': 0,
+				'default_frame': 626,
 				'animations': {
 					'stand_left': {
-						'frames': [9],
-						'speed': 10
+						'frames': [666],
+						'speed': 20
 					},
 					'walk_left': {
-						'frames': [10, 11],
-						'speed': 5
+						'frames': [666, 668],
+						'speed': 10
 					},
 					'run_left': {
-						'frames': [10, 11],
-						'speed': 10
+						'frames': [666, 668],
+						'speed': 20
 					},
 					'stand_right': {
-						'frames': [18],
-						'speed': 10
+						'frames': [669],
+						'speed': 20
 					},
 					'walk_right': {
-						'frames': [19, 20],
-						'speed': 5
+						'frames': [669, 671],
+						'speed': 10
 					},
 					'run_right': {
-						'frames': [19, 20],
-						'speed': 10
+						'frames': [669, 671],
+						'speed': 20
 					}
 				},
 				'properties': {
 					'reach': 5
 				}
 			},
-			'woman': {
-				'spritesheet': "players",
+			'girl': {
+				'spritesheet': "world",
 				'crop': {
 					'top': 0,
 					'right': 4,
 					'bottom': 0,
 					'left': 4
 				},
-				'default_frame': 3,
+				'default_frame': 706,
 				'animations': {
 					'stand_left': {
-						'frames': [12],
-						'speed': 10
+						'frames': [746],
+						'speed': 20
 					},
 					'walk_left': {
-						'frames': [13, 14],
-						'speed': 5
+						'frames': [746, 747, 748],
+						'speed': 10
 					},
 					'run_left': {
-						'frames': [13, 14],
-						'speed': 10
+						'frames': [746, 747, 748],
+						'speed': 20
 					},
 					'stand_right': {
-						'frames': [21],
-						'speed': 10
+						'frames': [749],
+						'speed': 20
 					},
 					'walk_right': {
-						'frames': [22, 23],
-						'speed': 5
+						'frames': [749, 750, 751],
+						'speed': 10
 					},
 					'run_right': {
-						'frames': [22, 23],
-						'speed': 10
+						'frames': [749, 750, 751],
+						'speed': 20
 					}
 				},
 				'properties': {
@@ -178,38 +178,38 @@
 				}
 			},
 			'alien': {
-				'spritesheet': "players",
+				'spritesheet': "world",
 				'crop': {
 					'top': 0,
 					'right': 6,
 					'bottom': 0,
 					'left': 6
 				},
-				'default_frame': 6,
+				'default_frame': 786,
 				'animations': {
 					'stand_left': {
-						'frames': [15],
-						'speed': 10
+						'frames': [826],
+						'speed': 20
 					},
 					'walk_left': {
-						'frames': [16, 17],
-						'speed': 5
+						'frames': [826, 827, 828],
+						'speed': 10
 					},
 					'run_left': {
-						'frames': [16, 17],
-						'speed': 10
+						'frames': [826, 827, 828],
+						'speed': 20
 					},
 					'stand_right': {
-						'frames': [24],
-						'speed': 10
+						'frames': [829],
+						'speed': 20
 					},
 					'walk_right': {
-						'frames': [25, 26],
-						'speed': 5
+						'frames': [829, 830, 831],
+						'speed': 10
 					},
 					'run_right': {
-						'frames': [25, 26],
-						'speed': 10
+						'frames': [829, 830, 831],
+						'speed': 20
 					}
 				},
 				'properties': {
@@ -244,5 +244,32 @@
 	
 	MinerGame.Entity.Player.prototype.getReach = function() {
 		return this.character.properties.reach;
+	};
+	
+	MinerGame.Entity.Player.prototype.getTileDistance = function(tileX, tileY) {
+		return this.game.math.distance(this.custWorld.layer.getTileX(this.x), this.custWorld.layer.getTileY(this.y), tileX, tileY);
+	};
+	
+	MinerGame.Entity.Player.prototype.hitTile = function(tileX, tileY) {
+		var distance_from_player = this.getTileDistance(tileX, tileY);
+		var max_distance = this.getReach();
+		
+		var tile = this.custWorld.getTile(tileX, tileY);
+		
+		if((distance_from_player <= max_distance) && (distance_from_player > 0.5)) {
+			var new_tile_type = "";
+			
+			// this is where the game can decide to pick item up or place an item
+			if("air" != tile.type) {
+				new_tile_type = "air";
+			} else {
+				//new_tile_type = "dirt";
+			}
+			
+			if("" !== new_tile_type) {
+				this.backpack.addItem(tile);
+				this.custWorld.replaceTile(tileX, tileY, new_tile_type);
+			}
+		}
 	};
 	

@@ -31,8 +31,8 @@
 		// tilemap
 		this.map = this.game.add.tilemap('dynamicMap', TILE_WIDTH, TILE_HEIGHT);
 		
-		// 'tiles' = cache image key
-		this.map.addTilesetImage('tiles', 'tiles', TILE_WIDTH, TILE_HEIGHT);
+		// addTilesetImage(tileset [, key] [, tileWidth] [, tileHeight] [, tileMargin] [, tileSpacing] [, gid])
+		this.map.addTilesetImage('world', 'world', TILE_WIDTH, TILE_HEIGHT);
 		
 		// layer 0
 		this.layer = this.map.createLayer("Tile Layer 1");
@@ -413,11 +413,11 @@
 			"tilesets": [
 				{
 					"firstgid": 0,
-					"image": "/static/images/world-tiles.png",
+					"image": "/static/images/world.png",
 					"imageheight": 2400,
-					"imagewidth": 512,
+					"imagewidth": 1280,
 					"margin": 0,
-					"name": "tiles",
+					"name": "world",
 					"properties": {
 						
 					},
@@ -429,7 +429,7 @@
 			],
 			"tilewidth": TILE_WIDTH,
 			"version": 1,
-			"width": 16
+			"width": 40
 		};
 	};
 	
