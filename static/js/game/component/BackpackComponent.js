@@ -360,6 +360,10 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.getActiveItem = function() {
+		if(!this.inventory[ this.selected_slot ]) {
+			return null;
+		}
+		
 		return this.inventory[ this.selected_slot ];
 	};
 	

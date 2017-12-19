@@ -10,7 +10,7 @@
 	MinerGame.State.Boot.prototype.constructor = MinerGame.State.Boot;
 	
 	MinerGame.State.Boot.prototype.init = function() {
-		console.log("State: Boot");
+		//console.log("State: Boot");
 		
 		// comment this out to enable multi-touch
 		this.input.maxPointers = 1;

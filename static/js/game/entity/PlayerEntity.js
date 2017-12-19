@@ -39,18 +39,11 @@
 		
 		// tool
 		this.tool = this.addChild(game.make.sprite((this.width / 2), (this.height / 2), 'world', tile_types.wood_shovel.sprites[0]));
-		//this.tool.anchor.setTo(0.5, 0.5);
 		this.tool.pivot.x = (TILE_WIDTH / 2);
 		this.tool.pivot.y = (TILE_HEIGHT / 2);
 		this.tool.alpha = 0;
 		this.tool.rotation = 90;
 		this.toolTween = null;
-		//this.tool.setFrame(tile_types.wood_shovel.sprites[0]);
-		/*this.tool = this.game.add.sprite(0, 0, 'world', tile_types.wood_shovel.default_frame);
-		this.tool.anchor.x = 0.5;
-		this.tool.anchor.y = 0.5;
-		this.tool.fixedToCamera = true;
-		this.tool.align*/
 		
 		// controls
 		this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -301,7 +294,7 @@
 		
 		var backpack_active_item = this.backpack.getActiveItem();
 		
-		if(backpack_active_item.type && ("tool" === backpack_active_item.type)) {
+		if((null !== backpack_active_item) && backpack_active_item.type && ("tool" === backpack_active_item.type)) {
 			// @TODO limit this from being called on "air" tiles
 			if(null !== this.toolTween) {
 				if(this.toolTween.isRunning) {
