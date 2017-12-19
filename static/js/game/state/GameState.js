@@ -109,17 +109,11 @@
 			return;
 		}
 		
-		var tileX = this.custWorld.layer.getTileX(worldX);
-		var tileY = this.custWorld.layer.getTileY(worldY);
+		//if((tileX < 0) || (tileX > this.custWorld.width) || (tileY < 0) || (tileY > this.custWorld.height)) {
+		//	return;
+		//}
 		
-		if((tileX < 0) || (tileX > this.custWorld.width) || (tileY < 0) || (tileY > this.custWorld.height)) {
-			return;
-		}
-		
-		
-		// @TODO
-		// move following code into new PlayerEntity.hitTile(tileX, tileY)
-		this.player.hitTile(tileX, tileY);
+		this.player.captureClick(worldX, worldY);
 	};
 	
 	// mouse wheel

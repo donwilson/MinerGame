@@ -119,6 +119,63 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.addItem = function(item, add_quantity) {
+		if(!item || !item.type || ("air" === item.type)) {
+			return;
+		}
+		
+		add_quantity = add_quantity || 1;
+		
+		var invIndex = null;
+		var backupIndex = null;
+		
+		_.each(this.inventory, function(value, index) {
+			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
+			if(value.item_name === item.type) {
+				invIndex = index;
+			} else if((null === invIndex) && ("air" === value.item_name) && (null === backupIndex)) {
+				backupIndex = index;
+			}
+		});
+		
+		if(null !== invIndex) {
+			this.inventory[ invIndex ].quantity += add_quantity;
+		} else {
+			// use first slot that has air?
+			if(null !== backupIndex) {
+				invIndex = backupIndex;
+			}
+			
+			// new inventory slot
+			if(null === invIndex) {
+				invIndex = this.inventory.length;
+			}
+			
+			this.inventory[ invIndex ] = {
+				'item_name': item.type,
+				'quantity': add_quantity,
+				'type': "tile"
+			};
+			
+			if(this.box_slots[ invIndex ]) {
+				this.box_slots[ invIndex ].type = item.type;
+				this.box_slots[ invIndex ].sprite.frame = tile_types[ item.type ].sprites[0];   // default sprite
+			}
+		}
+		
+		this.updateItemBoxes();
+	};
+	
+	MinerGame.Component.Backpack.prototype.addTool = function(item_name, add_quantity) {
+		if(!tile_types[ item_name ]) {
+			return false;
+		}
+		
+		var tile_info = tile_types[ item_name ];
+		
+		if(!tile_info.type || ("tool" !== tile_info.type)) {
+			return false;
+		}
+		
 		add_quantity = add_quantity || 1;
 		
 		var invIndex = null;
@@ -136,16 +193,100 @@
 			invIndex = this.inventory.length;
 			
 			this.inventory[ invIndex ] = {
-				'item_name': item.type,
-				'quantity': add_quantity
+				'item_name': item_name,
+				'quantity': add_quantity,
+				'type': tile_info.type
 			};
 			
 			if(this.box_slots[ invIndex ]) {
-				this.box_slots[ invIndex ].sprite.frame = tile_types[ item.type ].sprites[0];   // default sprite
+				this.box_slots[ invIndex ].type = item_name;
+				this.box_slots[ invIndex ].sprite.frame = tile_info.sprites[0];   // default sprite
 			}
 		}
 		
 		this.updateItemBoxes();
+	};
+	
+	MinerGame.Component.Backpack.prototype.emptySlot = function(slot) {
+		this.inventory[ slot ] = {
+			'item_name': "air",
+			'quantity': 0,
+			'type': "tile"
+		};
+		
+		if(this.box_slots[ slot ]) {
+			this.box_slots[ slot ].type = "air";
+			this.box_slots[ slot ].sprite.frame = tile_types['air'].sprites[0];
+		}
+	};
+	
+	MinerGame.Component.Backpack.prototype.useInventory = function(slot) {
+		if(!this.inventory[ slot ]) {
+			return;
+		}
+		
+		if("tool" === this.inventory[ slot ].type) {
+			// future...
+			
+			return;
+		} else if("tile" === this.inventory[ slot ].type) {
+			this.inventory[ slot ].quantity -= 1;
+			
+			if(this.inventory[ slot ].quantity <= 0) {
+				// empty out inventory slot
+				this.emptySlot(slot);
+			}
+			
+			this.updateItemBoxes();
+			
+			return;
+		}
+	};
+	
+	MinerGame.Component.Backpack.prototype.useSelectedItemSlot = function(tileX, tileY) {
+		if(!this.inventory[ this.selected_slot ]) {
+			return;
+		}
+		
+		var selected_inventory_item = this.inventory[ this.selected_slot ];
+		
+		if(!selected_inventory_item.quantity || ("air" === selected_inventory_item.item_name)) {
+			// nothing to do
+			return false;
+		}
+		
+		var tile_hit = this.custWorld.getTile(tileX, tileY);
+		var tile_holding = tile_types[ selected_inventory_item.item_name ];
+		
+		if("tool" === tile_holding.type) {
+			// use a tool
+			if("air" === tile_hit.type) {
+				return;
+			}
+			
+			if(tile_holding && tile_holding.properties && tile_holding.properties.effective_tiles && tile_holding.properties.effective_tiles.length && (-1 !== _.indexOf(tile_holding.properties.effective_tiles, tile_hit.type))) {
+				// tool can be used against this
+				this.addItem(tile_hit);
+				this.custWorld.replaceTile(tileX, tileY, "air");
+				
+				//this.useInventory(this.selected_slot);
+				
+				this.updateItemBoxes();
+			}
+			
+			return;
+		} else if("tile" === tile_holding.type) {
+			// place a tile
+			if("air" !== tile_hit.type) {
+				// cant overwrite non-air
+				return;
+			}
+			
+			this.useInventory(this.selected_slot);
+			this.custWorld.replaceTile(tileX, tileY, selected_inventory_item.item_name);
+			
+			return;
+		}
 	};
 	
 	MinerGame.Component.Backpack.prototype.updateItemBoxes = function() {
@@ -162,9 +303,14 @@
 				// show sprite
 				this.box_slots[ i ].sprite.alpha = 1;
 				
-				// show item text
-				this.box_slots[ i ].draw_text.alpha = 1;
-				this.box_slots[ i ].draw_text.setText(quantity);
+				// show item text on tiles
+				if("tool" === this.inventory[ i ].type) {
+					this.box_slots[ i ].draw_text.setText("0");
+					this.box_slots[ i ].draw_text.alpha = 0;
+				} else {
+					this.box_slots[ i ].draw_text.alpha = 1;
+					this.box_slots[ i ].draw_text.setText(quantity);
+				}
 			} else {
 				// hide sprite
 				this.box_slots[ i ].sprite.alpha = 0;
@@ -211,6 +357,10 @@
 		
 		// redraw bottom inventory
 		this.draw();
+	};
+	
+	MinerGame.Component.Backpack.prototype.getActiveItem = function() {
+		return this.inventory[ this.selected_slot ];
 	};
 	
 	MinerGame.Component.Backpack.prototype.capturedClick = function(screenX, screenY) {
@@ -262,3 +412,4 @@
 		
 		this.setActiveItemSlot(new_selected_slot);
 	};
+	

@@ -10,7 +10,12 @@
 		this.spawn = this.custWorld.getSpawn();
 		this.backpack = new MinerGame.Component.Backpack(this.game, this.custWorld);
 		
+		this.backpack.addTool("wood_shovel");
+		
 		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
+		
+		// add generated player to game
+		this.game.add.existing(this);
 		
 		//this.character = playable_characters[ game.rnd.pick( _.keys(playable_characters) ) ];
 		
@@ -32,6 +37,21 @@
 		this.body.linearDamping = 1;
 		this.body.collideWorldBounds = true;
 		
+		// tool
+		this.tool = this.addChild(game.make.sprite((this.width / 2), (this.height / 2), 'world', tile_types.wood_shovel.sprites[0]));
+		//this.tool.anchor.setTo(0.5, 0.5);
+		this.tool.pivot.x = (TILE_WIDTH / 2);
+		this.tool.pivot.y = (TILE_HEIGHT / 2);
+		this.tool.alpha = 0;
+		this.tool.rotation = 90;
+		this.toolTween = null;
+		//this.tool.setFrame(tile_types.wood_shovel.sprites[0]);
+		/*this.tool = this.game.add.sprite(0, 0, 'world', tile_types.wood_shovel.default_frame);
+		this.tool.anchor.x = 0.5;
+		this.tool.anchor.y = 0.5;
+		this.tool.fixedToCamera = true;
+		this.tool.align*/
+		
 		// controls
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		this.wasd = {
@@ -41,9 +61,6 @@
 			'right': this.game.input.keyboard.addKey(Phaser.Keyboard.D),
 			'jump': this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
 		};
-		
-		// add generated player to game
-		this.game.add.existing(this);
 	};
 	
 	MinerGame.Entity.Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -246,30 +263,70 @@
 		return this.character.properties.reach;
 	};
 	
-	MinerGame.Entity.Player.prototype.getTileDistance = function(tileX, tileY) {
-		return this.game.math.distance(this.custWorld.layer.getTileX(this.x), this.custWorld.layer.getTileY(this.y), tileX, tileY);
+	MinerGame.Entity.Player.prototype.getDistance = function(x, y) {
+		//return this.game.math.distance(this.custWorld.layer.getTileX(this.x), this.custWorld.layer.getTileY(this.y), tileX, tileY);
+		return this.game.math.distance(this.centerX, this.centerY, x, y);
 	};
 	
-	MinerGame.Entity.Player.prototype.hitTile = function(tileX, tileY) {
-		var distance_from_player = this.getTileDistance(tileX, tileY);
+	MinerGame.Entity.Player.prototype.captureClick = function(worldX, worldY) {
+		var distance_from_player = this.getDistance(worldX, worldY);
 		var max_distance = this.getReach();
 		
-		var tile = this.custWorld.getTile(tileX, tileY);
-		
-		if((distance_from_player <= max_distance) && (distance_from_player > 0.5)) {
-			var new_tile_type = "";
-			
-			// this is where the game can decide to pick item up or place an item
-			if("air" != tile.type) {
-				new_tile_type = "air";
-			} else {
-				//new_tile_type = "dirt";
-			}
-			
-			if("" !== new_tile_type) {
-				this.backpack.addItem(tile);
-				this.custWorld.replaceTile(tileX, tileY, new_tile_type);
-			}
+		if(distance_from_player > (max_distance * TILE_WIDTH)) {
+			// too far away
+			return false;
 		}
+		
+		
+		
+		// --v this could be better
+		//console.log("worldX,worldY = ("+ worldX +","+ worldY +")");
+		//console.log("player.centerX,centerY = ("+ this.x +","+ this.y +")");
+		//console.log("distance_from_player = "+ distance_from_player);
+		
+		var tileX = this.custWorld.layer.getTileX(worldX);
+		var tileY = this.custWorld.layer.getTileY(worldY);
+		
+		var playerTileX = this.custWorld.layer.getTileX(this.centerX);
+		var playerTileY = this.custWorld.layer.getTileY(this.centerY);
+		
+		if((distance_from_player < Math.max((this.width / 2), (this.height / 2)))) {
+			// too close
+			return false;
+		} else if((tileX == playerTileX) && (tileY == playerTileY)) {
+			// too close
+			return false;
+		}
+		// --^ this could be better
+		
+		var backpack_active_item = this.backpack.getActiveItem();
+		
+		if(backpack_active_item.type && ("tool" === backpack_active_item.type)) {
+			// @TODO limit this from being called on "air" tiles
+			if(null !== this.toolTween) {
+				if(this.toolTween.isRunning) {
+					// delay clicks when tool is working
+					return;
+				}
+				
+				this.toolTween.stop(true);
+				this.toolTween = null;
+			}
+			
+			this.tool.frame = tile_types[ backpack_active_item.item_name ].sprites[0];
+			this.tool.angle = 90;
+			this.tool.alpha = 0.9;
+			
+			this.toolTween = this.game.add.tween(this.tool).to({
+				'angle': 180
+			}, 300, Phaser.Easing.Linear.None, true);
+			
+			this.toolTween.onComplete.add(function(target, tween) {
+				target.alpha = 0;
+				target.angle = 90;
+			}, this);
+		}
+		
+		this.backpack.useSelectedItemSlot(tileX, tileY);
 	};
 	
