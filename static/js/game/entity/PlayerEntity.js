@@ -10,6 +10,9 @@
 		this.spawn = this.custWorld.getSpawn();
 		this.backpack = new MinerGame.Component.Backpack(this.game, this.custWorld);
 		
+		this.facing_right = false;
+		this.is_standing = false;
+		
 		this.backpack.addTool("wood_shovel");
 		
 		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
@@ -38,11 +41,15 @@
 		this.body.collideWorldBounds = true;
 		
 		// tool
-		this.tool = this.addChild(game.make.sprite((this.width / 2), (this.height / 2), 'world', tile_types.wood_shovel.sprites[0]));
-		this.tool.pivot.x = (TILE_WIDTH / 2);
-		this.tool.pivot.y = (TILE_HEIGHT / 2);
-		this.tool.alpha = 0;
-		this.tool.rotation = 90;
+		this.tool = this.addChild(game.make.sprite(0, 0, 'world', tile_types.wood_shovel.sprites[0]));
+		//this.tool.fixedToCamera = true;
+		this.tool.name = "wood_shovel";
+		//this.tool.alpha = 0;
+		this.positionTool();
+		this.tool.angle = this.calculateToolAngle(tile_types.wood_shovel.angle_resting);
+		
+		
+		// tween for tool
 		this.toolTween = null;
 		
 		// controls
@@ -70,18 +77,19 @@
 		}
 		
 		var do_jump = this.cursors.up.isDown || this.wasd.jump.isDown || false;
-		var is_standing = this.body.onFloor();
+		this.is_standing = this.body.onFloor();
 		var running_left = this.cursors.left.isDown || this.wasd.left.isDown || false;
 		var running_right = this.cursors.right.isDown || this.wasd.right.isDown || false;
 		
-		if(do_jump && is_standing) {
+		if(do_jump && this.is_standing) {
 			this.body.velocity.y = -player_jump_amount;
 		}
 		
 		if(running_left && !running_right) {
+			this.faceLeft();
 			this.body.velocity.x = -player_speed;
 			
-			if(do_jump || !is_standing) {
+			if(do_jump || !this.is_standing) {
 				this.animations.play('stand_left');
 			} else if(is_fast) {
 				this.animations.play('run_left');
@@ -89,9 +97,11 @@
 				this.animations.play('walk_left');
 			}
 		} else if(running_right && !running_left) {
+			this.faceRight();
+			
 			this.body.velocity.x = player_speed;
 			
-			if(do_jump || !is_standing) {
+			if(do_jump || !this.is_standing) {
 				this.animations.play('stand_right');
 			} else if(is_fast) {
 				this.animations.play('run_right');
@@ -102,9 +112,75 @@
 			// standing still
 			this.body.velocity.x = 0;
 			
-			this.animations.stop();
-			this.frame = this.character.default_frame;
+			//this.animations.stop();
+			//this.frame = this.character.default_frame;
+			if(this.facing_right) {
+				this.animations.play('stand_right');	
+			} else {
+				this.animations.play('stand_left');
+			}
 		}
+	};
+	
+	MinerGame.Entity.Player.prototype.faceLeft = function() {
+		if(!this.facing_right) {
+			return;
+		}
+		
+		this.facing_right = false;
+		
+		this.positionTool();
+	};
+	
+	MinerGame.Entity.Player.prototype.faceRight = function() {
+		if(this.facing_right) {
+			return;
+		}
+		
+		this.facing_right = true;
+		
+		this.positionTool();
+	};
+	
+	MinerGame.Entity.Player.prototype.positionTool = function() {
+		var backpack_active_item = this.backpack.getActiveItem();
+		
+		if((null === backpack_active_item) || !backpack_active_item.type || ("tool" !== backpack_active_item.type)) {
+			this.tool.alpha = 0;
+			
+			return;
+		}
+		
+		this.tool.alpha = 1;
+		
+		this.tool.anchor.setTo(0, 0);
+		
+		if(this.facing_right) {
+			this.tool.scale.x = 1;
+			this.tool.x = (this.character.hand_offset.x - this.character.crop.left);
+		} else {
+			this.tool.scale.x = -1;
+			this.tool.x = (this.character.hand_offset.x - this.character.crop.left);
+		}
+		
+		this.tool.y = (this.character.hand_offset.y - this.character.crop.top);
+		
+		this.tool.anchor.setTo(
+			((tile_types[ backpack_active_item.item_name ].grip_offset.x / this.tool.width) * this.tool.scale.x),
+			((tile_types[ backpack_active_item.item_name ].grip_offset.y / this.tool.height) * this.tool.scale.y)
+		);
+		
+		this.tool.angle = (Math.abs(this.tool.angle) * this.tool.scale.x);
+	};
+		
+	MinerGame.Entity.Player.prototype.calculateToolAngle = function(desired_angle) {
+		var multiplier = 1;
+		
+		if(!this.facing_right) {
+			multiplier = -1;
+		}
+		return ((-tile_types[ this.tool.name ].angle_offset + desired_angle) * multiplier);
+		//return (((360 - tile_types[ this.tool.name ].angle_offset) + desired_angle) * multiplier);
 	};
 	
 	MinerGame.Entity.Player.prototype.pickCharacter = function() {
@@ -116,6 +192,10 @@
 					'right': 6,
 					'bottom': 0,
 					'left': 6
+				},
+				'hand_offset': {
+					'x': 16,
+					'y': 22
 				},
 				'default_frame': 626,
 				'animations': {
@@ -156,6 +236,10 @@
 					'bottom': 0,
 					'left': 4
 				},
+				'hand_offset': {
+					'x': 16,
+					'y': 23
+				},
 				'default_frame': 706,
 				'animations': {
 					'stand_left': {
@@ -194,6 +278,10 @@
 					'right': 6,
 					'bottom': 0,
 					'left': 6
+				},
+				'hand_offset': {
+					'x': 15,
+					'y': 22
 				},
 				'default_frame': 786,
 				'animations': {
@@ -238,7 +326,7 @@
 		this.croppedRect = Phaser.Rectangle(0, 0, TILE_WIDTH, TILE_HEIGHT);
 		
 		if(!this.character.crop.top && !this.character.crop.right && !this.character.crop.bottom && !this.character.crop.left) {
-			console.log("No need to crop");
+			//console.log("No need to crop");
 			return;
 		}
 		
@@ -277,16 +365,18 @@
 		//console.log("player.centerX,centerY = ("+ this.x +","+ this.y +")");
 		//console.log("distance_from_player = "+ distance_from_player);
 		
+		if((distance_from_player < Math.max((this.width / 2), (this.height / 2)))) {
+			// too close
+			return false;
+		}
+		
 		var tileX = this.custWorld.layer.getTileX(worldX);
 		var tileY = this.custWorld.layer.getTileY(worldY);
 		
 		var playerTileX = this.custWorld.layer.getTileX(this.centerX);
 		var playerTileY = this.custWorld.layer.getTileY(this.centerY);
 		
-		if((distance_from_player < Math.max((this.width / 2), (this.height / 2)))) {
-			// too close
-			return false;
-		} else if((tileX == playerTileX) && (tileY == playerTileY)) {
+		if((tileX == playerTileX) && (tileY == playerTileY)) {
 			// too close
 			return false;
 		}
@@ -295,6 +385,11 @@
 		var backpack_active_item = this.backpack.getActiveItem();
 		
 		if((null !== backpack_active_item) && backpack_active_item.type && ("tool" === backpack_active_item.type)) {
+			// cant use tool while jumping (for now)
+			if(!this.is_standing) {
+				return;
+			}
+			
 			// @TODO limit this from being called on "air" tiles
 			if(null !== this.toolTween) {
 				if(this.toolTween.isRunning) {
@@ -307,19 +402,21 @@
 			}
 			
 			this.tool.frame = tile_types[ backpack_active_item.item_name ].sprites[0];
-			this.tool.angle = 90;
+			this.tool.angle = this.calculateToolAngle(tile_types[ backpack_active_item.item_name ].angle_resting);
 			this.tool.alpha = 0.9;
 			
 			this.toolTween = this.game.add.tween(this.tool).to({
-				'angle': 180
-			}, 300, Phaser.Easing.Linear.None, true);
+				'angle': this.calculateToolAngle(tile_types[ backpack_active_item.item_name ].angle_max)
+			}, 240, Phaser.Easing.Linear.None, true);
 			
 			this.toolTween.onComplete.add(function(target, tween) {
-				target.alpha = 0;
-				target.angle = 90;
+				//target.alpha = 0;
+				target.angle = this.calculateToolAngle(tile_types[ backpack_active_item.item_name ].angle_resting);
+				
+				this.backpack.useSelectedItemSlot(tileX, tileY);
 			}, this);
+		} else {
+			this.backpack.useSelectedItemSlot(tileX, tileY);
 		}
-		
-		this.backpack.useSelectedItemSlot(tileX, tileY);
 	};
 	

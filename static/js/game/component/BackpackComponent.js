@@ -87,10 +87,11 @@
 		// backpack background
 		this.box_graphic.beginFill(this.box_background_color);
 		this.box_graphic.fillAlpha = this.box_background_alpha;
-		this.box_graphic.moveTo(0, 0);
-		this.box_graphic.lineTo(this.backpack_rect.width, 0);
-		this.box_graphic.lineTo(this.backpack_rect.width, this.backpack_rect.height);
-		this.box_graphic.lineTo(0, this.backpack_rect.height);
+		this.box_graphic.drawRect(0, 0, this.backpack_rect.width, this.backpack_rect.height);
+		//this.box_graphic.moveTo(0, 0);
+		//this.box_graphic.lineTo(this.backpack_rect.width, 0);
+		//this.box_graphic.lineTo(this.backpack_rect.width, this.backpack_rect.height);
+		//this.box_graphic.lineTo(0, this.backpack_rect.height);
 		this.box_graphic.endFill();
 		
 		// item boxes

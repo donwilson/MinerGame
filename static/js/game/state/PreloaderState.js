@@ -29,9 +29,9 @@
 		this.game.load.onFileComplete.add(this.onFileComplete, this);
 		this.game.load.onLoadComplete.add(this.onLoadComplete, this);
 		
-		this.game.load.image('background', "static/images/background.jpg");
-		this.game.load.spritesheet('world', "static/images/world.png", TILE_WIDTH, TILE_HEIGHT);
-		this.game.load.spritesheet('button_sprite', "static/images/button-sprite.png", 32, 32);
+		this.game.load.image('background', "/static/images/background.jpg");
+		this.game.load.spritesheet('world', "/static/images/world.png", TILE_WIDTH, TILE_HEIGHT);
+		this.game.load.spritesheet('button_sprite', "/static/images/button-sprite.png", 32, 32);
 	};
 	
 	//MinerGame.State.Preloader.prototype.create = function() {

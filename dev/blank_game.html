@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+	<title>Blank Quick Phaser Game</title>
+	<link rel="stylesheet" href="static/css/reset.css" />
+	<link rel="stylesheet" href="static/css/style.css" />
+	
+	<script type="text/javascript" src="static/js/lib/underscore-1.8.3.min.js"></script>
+	<script type="text/javascript" src="static/js/lib/phaser-ce-2.9.2.min.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
+			'preload': preload,
+			'create': create,
+			'update': update,
+			'render': render
+		});
+		
+		function preload() {
+			game.load.image('mario', "/static/images/tmp/mario.png");
+		}
+		
+		var sprite;
+		
+		function create() {
+			game.stage.backgroundColor = "#105ca5";
+			
+			sprite = game.add.sprite(0, 0, 'mario');
+		}
+		
+		function update() {
+			
+		}
+		
+		function render() {
+			
+		}
+		
+	</script>
+</body>
+</html>

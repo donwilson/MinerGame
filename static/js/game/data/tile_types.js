@@ -51,7 +51,14 @@ var tile_types = {
 		'properties': {
 			'strength': 1,
 			'effective_tiles': ['dirt']
-		}
+		},
+		'grip_offset': {
+			'x': 7,
+			'y': 24
+		},
+		'angle_offset': 45,
+		'angle_resting': 110,
+		'angle_max': 20
 	},
 	'wood_pickaxe': {
 		'type': "tool",
@@ -60,6 +67,13 @@ var tile_types = {
 		'properties': {
 			'strength': 1,
 			'effective_tiles': ['stone', 'ore']
-		}
+		},
+		'grip_offset': {
+			'x': 7,
+			'y': 24
+		},
+		'angle_offset': 45,
+		'angle_resting': 20,
+		'angle_max': 110
 	}
 };

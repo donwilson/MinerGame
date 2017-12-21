@@ -32,7 +32,9 @@
 		
 		// make cursor marker
 		this.marker = this.game.add.graphics();
-		this.marker.lineStyle(2, 0xffffff, 1);
+		this.marker.beginFill(0xFFFFFF);
+		this.marker.fillAlpha = 0.2;
+		//this.marker.lineStyle(2, 0xffffff, 1);
 		this.marker.drawRect(0, 0, TILE_WIDTH, TILE_HEIGHT);
 		
 		// player
@@ -63,12 +65,18 @@
 	MinerGame.State.Game.prototype.update = function() {
 		this.game.physics.arcade.collide(this.player, this.custWorld.layer);
 		
+		//this.player.tool.angle += 1;
+		
 		this.marker.x = (this.custWorld.layer.getTileX(this.game.input.activePointer.worldX) * TILE_WIDTH);
 		this.marker.y = (this.custWorld.layer.getTileY(this.game.input.activePointer.worldY) * TILE_HEIGHT);
 	};
 	
 	MinerGame.State.Game.prototype.render = function() {
-		
+		//this.game.debug.text("tool: "+ this.player.tool.x +","+ this.player.tool.y, 16, 16);
+		//this.game.debug.text("tool angle: "+ this.player.tool.angle, 16, 32);
+		//this.game.debug.text("tool scale.x: "+ this.player.tool.scale.x, 16, 48);
+		//this.game.debug.spriteBounds(this.player);
+		//this.game.debug.spriteBounds(this.player.tool);
 	};
 	
 	

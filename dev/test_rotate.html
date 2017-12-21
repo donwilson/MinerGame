@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+	<title>Test Sprite Rotation Around Pivot</title>
+	<link rel="stylesheet" href="/static/css/reset.css" />
+	<link rel="stylesheet" href="/static/css/style.css" />
+	
+	<script type="text/javascript" src="/static/js/lib/underscore-1.8.3.min.js"></script>
+	<script type="text/javascript" src="/static/js/lib/phaser-ce-2.9.2.min.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var game = new Phaser.Game(800, 600, Phaser.AUTO, null, {
+			'preload': preload,
+			'create': create,
+			'update': update,
+			'render': render
+		});
+		
+		function preload() {
+			game.load.image('mario', "/static/images/tmp/mario.png");
+			game.load.image('tool', "/static/images/tmp/sword.png");
+		}
+		
+		
+		var cursors;
+		
+		var mario;
+		var tool;
+		var is_facing_right = true;
+		
+		var mario_hand_x = 60;
+		var mario_hand_y = 300;
+		
+		var image_tool_angle = -45;
+		var tool_standard_angle = 20;
+		var tool_max_angle = (tool_standard_angle + 90);
+		
+		
+		function create() {
+			game.stage.backgroundColor = "#105ca5";
+			
+			cursors = this.game.input.keyboard.createCursorKeys();
+			
+			// mario
+			mario = game.add.sprite(0, 0, 'mario');
+			mario.anchor.setTo(0.5, 0.5);
+			mario.alignIn(game.camera.view, Phaser.CENTER);
+			
+			// tool
+			tool = game.add.sprite(0, 0, 'tool');
+			alignToolToHand();
+			
+			// reset tool to angle up
+			tool.angle = calculateToolAngle(tool_standard_angle);
+		}
+		
+		function update() {
+			var pressing_left = cursors.left.isDown;
+			var pressing_right = cursors.right.isDown;
+			
+			if(pressing_left && !pressing_right) {
+				setFacingLeft();
+			} else if(pressing_right && !pressing_left) {
+				setFacingRight();
+			}
+			
+			if(is_facing_right) {
+				if(game.input.activePointer.leftButton.isDown) {
+					if(tool.angle < calculateToolAngle(tool_max_angle)) {
+						tool.angle += 5;
+					}
+				} else {
+					if(tool.angle > calculateToolAngle(tool_standard_angle)) {
+						tool.angle -= 5;
+					}
+				}
+			} else {
+				if(game.input.activePointer.leftButton.isDown) {
+					if(tool.angle > calculateToolAngle(tool_max_angle)) {
+						tool.angle -= 5;
+					}
+				} else {
+					if(tool.angle < calculateToolAngle(tool_standard_angle)) {
+						tool.angle += 5;
+					}
+				}
+			}
+		}
+		
+		function render() {
+			game.debug.text("tool angle: "+ tool.angle, 16, 16);
+			
+			// camera center
+			// yellow
+			game.debug.geom(new Phaser.Point(
+				game.camera.view.centerX,
+				game.camera.view.centerY
+			), "#fff600");   // yellow
+			
+			// mario hand point
+			// pink
+			var mario_hand_point = getMarioHandPoint();
+			game.debug.geom(mario_hand_point, "#ff00ea");   // pink
+			game.debug.text("mario hand: "+ mario_hand_point.x +","+ mario_hand_point.y, 16, 32);
+			
+			// tool pivot point
+			// green
+			game.debug.geom(new Phaser.Point(
+				(tool.x + tool.pivot.x),
+				(tool.y + tool.pivot.y)
+			), "#0cff00");   // green
+			
+			// sprite bounds
+			game.debug.spriteBounds(mario, "#cccccc", false);
+			game.debug.spriteBounds(tool, "#ffffff", false);
+			
+			// mario
+			game.debug.text("mario top,left: "+ mario.top +","+ mario.left, 16, 48);
+		}
+		
+		
+		function calculateToolAngle(desired_angle) {
+			var multiplier = 1;
+			
+			if(!is_facing_right) {
+				multiplier = -1;
+			}
+			
+			return ((image_tool_angle + desired_angle) * multiplier);
+		}
+		
+		function getMarioHandPoint() {
+			return new Phaser.Point(
+				(mario.left + (mario_hand_x * mario.scale.x)),
+				(mario.top + (mario_hand_y * mario.scale.y))
+			)
+		}
+		
+		function updateFacingSide(is_left) {
+			if((!is_facing_right && is_left) || (is_facing_right && !is_left)) {
+				// no change
+				return;
+			}
+			
+			is_facing_right = !is_left;
+			
+			// flip horizontal scales
+			mario.scale.x *= -1;
+			tool.scale.x *= -1;
+			
+			alignToolToHand();
+		}
+		
+		function setFacingLeft() {
+			updateFacingSide(true);
+		}
+		
+		function setFacingRight() {
+			updateFacingSide(false);
+		}
+		
+		function alignToolToHand() {
+			var tool_handle_x = 50;
+			var tool_handle_y = 220;
+			
+			// reset anchor to allow .alignIn to work properly
+			tool.anchor.setTo(0, 0);
+			
+			// align within player sprite
+			tool.alignIn(mario, Phaser.TOP_LEFT,
+				(mario_hand_x * tool.scale.x * -1),
+				(mario_hand_y * tool.scale.y * -1)
+			);
+			
+			// set anchor
+			tool.anchor.setTo(
+				((tool_handle_x / tool.width) * tool.scale.x),
+				((tool_handle_y / tool.height) * tool.scale.y)
+			);
+			
+			// set angle
+			tool.angle *= -1;
+		}
+		
+		
+	</script>
+</body>
+</html>
