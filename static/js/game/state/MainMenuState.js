@@ -11,9 +11,12 @@
 	MinerGame.State.MainMenu.prototype = Object.create(Phaser.State.prototype);
 	MinerGame.State.MainMenu.prototype.constructor = MinerGame.State.MainMenu;
 	
-	//MinerGame.State.MainMenu.prototype.init = function() {
-	//	console.log("State: MainMenu");
-	//};
+	MinerGame.State.MainMenu.prototype.init = function() {
+		//console.log("State: MainMenu");
+		
+		// set stage bg
+		this.game.stage.backgroundColor = "#10151d";
+	};
 	
 	//MinerGame.State.MainMenu.prototype.preload = function() {
 	//	game.load.image('button_start', "static/images/button_start.png");

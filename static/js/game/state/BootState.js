@@ -12,6 +12,9 @@
 	MinerGame.State.Boot.prototype.init = function() {
 		//console.log("State: Boot");
 		
+		// set stage bg
+		this.game.stage.backgroundColor = "#10151d";
+		
 		// comment this out to enable multi-touch
 		this.input.maxPointers = 1;
 		

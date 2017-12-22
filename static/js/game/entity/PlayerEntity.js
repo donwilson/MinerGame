@@ -16,13 +16,14 @@
 		
 		this.facing_right = false;
 		this.is_standing = true;
+		this.can_jump = true;
+		this.stopping_jump = false;
+		this.jump_delay = 200;   // MS between landing and ability to jump again
 		
 		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
 		
 		// add generated player to game
 		this.game.add.existing(this);
-		
-		//this.character = playable_characters[ game.rnd.pick( _.keys(playable_characters) ) ];
 		
 		// animations
 		for(var key in this.character.animations) {
@@ -72,13 +73,27 @@
 			player_speed = (TILE_WIDTH * 18);
 		}
 		
-		var do_jump = this.cursors.up.isDown || this.wasd.jump.isDown || false;
+		var pressing_jump = this.cursors.up.isDown || this.wasd.jump.isDown || false;
+		var do_jump = false;   // set after we know if player can jump
 		this.is_standing = this.body.onFloor();
 		var running_left = this.cursors.left.isDown || this.wasd.left.isDown || false;
 		var running_right = this.cursors.right.isDown || this.wasd.right.isDown || false;
 		
-		if(do_jump && this.is_standing) {
+		if(this.can_jump && pressing_jump && this.is_standing) {
+			// jump
 			this.body.velocity.y = -player_jump_amount;
+			do_jump = true;
+			
+			this.can_jump = false;
+		} else if(!this.can_jump && !this.stopping_jump && this.is_standing) {
+			// prevent jumping for a moment after player lands
+			this.stopping_jump = true;
+			
+			//add(delayMS, callback, callbackContext[, arguments]<repeatable>)
+			this.game.time.events.add(this.jump_delay, function() {
+				this.can_jump = true;
+				this.stopping_jump = false;
+			}, this);
 		}
 		
 		if(running_left && !running_right) {
@@ -173,11 +188,11 @@
 		if("tool" === item.type) {
 			if(this.facing_right) {
 				this.tool.scale.x = 1;
-				this.tool.scale.y = 1;
 			} else {
 				this.tool.scale.x = -1;
-				this.tool.scale.y = 1;
 			}
+			
+			this.tool.scale.y = 1;
 			
 			this.tool.anchor.setTo(
 				((item.grip_offset.x / this.tool.width) * this.tool.scale.x),
@@ -185,11 +200,9 @@
 			);
 			
 			if(!this.tweens.tool || (null === this.tweens.tool) || !this.tweens.tool.isRunning) {
-				console.log("item["+ this.tool.name +"].angle_resting = "+ item.angle_resting +" (calc: "+ this.calculateToolAngle(item.angle_resting) +") :: Player.positionTool");
+				//console.log("item["+ this.tool.name +"].angle_resting = "+ item.angle_resting +" (calc: "+ this.calculateToolAngle(item.angle_resting) +") :: Player.positionTool");
 				this.tool.angle = this.calculateToolAngle(item.angle_resting);
 			}
-			
-			this.tool.angle = (Math.abs(this.tool.angle) * this.tool.scale.x);
 		} else {
 			this.tool.anchor.setTo(0.5, 0.5);
 			this.tool.angle = 0;
@@ -199,29 +212,19 @@
 		
 		this.tool.alpha = 1;
 	};
-		
-	/*MinerGame.Entity.Player.prototype.calculateToolAngle = function(desired_angle) {
-		var multiplier = 1;
-		
-		if(!this.facing_right) {
-			multiplier = -1;
-		}
-		
-		return ((-tile_types[ this.tool.name ].angle_offset + desired_angle) * multiplier);
-	};*/
 	
 	MinerGame.Entity.Player.prototype.calculateToolAngle = function(desired_angle) {
 		var angle_calc = 0;
 		
 		angle_calc -= tile_types[ this.tool.name ].angle_offset;
-		
 		angle_calc += desired_angle;
 		
 		if(!this.facing_right) {
 			angle_calc *= -1;
 		}
 		
-		return angle_calc;
+		//return angle_calc;
+		return this.game.math.wrapAngle(angle_calc);
 	};
 	
 	MinerGame.Entity.Player.prototype.pickCharacter = function() {
@@ -350,8 +353,8 @@
 		
 		this.tool.angle = angle_start;
 		
-		console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenStart");
-		console.log("tool["+ backpack_active_item.item_name +"].angle_max     = "+ tile_types[ backpack_active_item.item_name ].angle_max +" (calc: "+ angle_end +") :: player.animateTool.tweenTo");
+		//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenStart");
+		//console.log("tool["+ backpack_active_item.item_name +"].angle_max     = "+ tile_types[ backpack_active_item.item_name ].angle_max +" (calc: "+ angle_end +") :: player.animateTool.tweenTo");
 		
 		//Phaser.Tween.to(properties [, duration] [, ease] [, autoStart] [, delay] [, repeat] [, yoyo])
 		this.tweens.tool = this.game.add.tween(this.tool);
@@ -361,7 +364,7 @@
 		
 		this.tweens.tool.onComplete.add(function(target, tween) {
 			//target.alpha = 0;
-			console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenComplete");
+			//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenComplete");
 			target.angle = angle_start;
 			
 			//if(callable_done) {

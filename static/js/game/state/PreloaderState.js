@@ -19,9 +19,12 @@
 	MinerGame.State.Preloader.prototype = Object.create(Phaser.State.prototype);
 	MinerGame.State.Preloader.prototype.constructor = MinerGame.State.Preloader;
 	
-	//MinerGame.State.Preloader.prototype.init = function() {
-	//	console.log("State: Preloader");
-	//};
+	MinerGame.State.Preloader.prototype.init = function() {
+		//console.log("State: Preloader");
+		
+		// set stage bg
+		this.game.stage.backgroundColor = "#10151d";
+	};
 	
 	MinerGame.State.Preloader.prototype.preload = function() {
 		this.game.load.onLoadStart.add(this.onLoadStart, this);

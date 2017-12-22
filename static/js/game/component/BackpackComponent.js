@@ -18,6 +18,7 @@
 		
 		this.backpack_rect = null;
 		
+		// settings
 		this.box_corner_radius = 6;   // radius of box corners
 		this.box_margin = 16;   // margin from side of game
 		this.box_padding = 8;   // padding from box to box items
@@ -283,13 +284,22 @@
 			
 			if(tile_holding && tile_holding.properties && tile_holding.properties.effective_tiles && tile_holding.properties.effective_tiles.length && (-1 !== _.indexOf(tile_holding.properties.effective_tiles, tile_hit.type))) {
 				// tool can be used against this
-				this.addItem(tile_hit);
-				this.custWorld.replaceTile(tileX, tileY, "air");
+				//console.log("tile_hit.strength = ", tile_hit.strength);
+				//console.log("tile_hit.health = ", tile_hit.health);
 				
-				//this.useInventory(this.selected_slot);
+				if(!tile_hit.strength) {
+					// impossible to break
+					return;
+				}
 				
-				this.updateItemBoxes();
-				//this.player.positionTool();
+				if(true === this.custWorld.hitTile(tileX, tileY, tile_holding.properties.strength)) {
+					// broke tile, add to inventory
+					this.addItem(tile_hit);
+					//this.custWorld.replaceTile(tileX, tileY, "air");
+					//this.useInventory(this.selected_slot);
+					this.updateItemBoxes();
+					//this.player.positionTool();
+				}
 			}
 			
 			return;

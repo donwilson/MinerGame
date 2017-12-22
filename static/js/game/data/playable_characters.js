@@ -88,7 +88,7 @@ var playable_characters = {
 	'alien': {
 		'spritesheet': "world",
 		'crop': {
-			'top': 0,
+			'top': 1,
 			'right': 6,
 			'bottom': 0,
 			'left': 6

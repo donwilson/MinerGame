@@ -8,13 +8,22 @@ var tile_types = {
 			'strength': 0
 		}
 	},
+	'bedrock': {
+		'type': "tile",
+		'sprites': [360, 361, 362, 363],
+		'collide': true,
+		'properties': {
+			'title': "Bedrock",
+			'strength': 0
+		}
+	},
 	'dirt': {
 		'type': "tile",
 		'sprites': [200, 201, 203, 204, 205, 206, 207],
 		'collide': true,
 		'properties': {
 			'title': "Dirt",
-			'strength': 4
+			'strength': 1
 		}
 	},
 	'stone': {
@@ -23,7 +32,7 @@ var tile_types = {
 		'collide': true,
 		'properties': {
 			'title': "Stone",
-			'strength': 6
+			'strength': 3
 		}
 	},
 	'ore': {
@@ -32,7 +41,7 @@ var tile_types = {
 		'collide': true,
 		'properties': {
 			'title': "Ore",
-			'strength': 6
+			'strength': 5
 		}
 	},
 	'lava': {
@@ -73,7 +82,7 @@ var tile_types = {
 			'y': 24
 		},
 		'angle_offset': 45,
-		'angle_resting': 20,
+		'angle_resting': 40,
 		'angle_max': 110
 	}
 };
