@@ -2,7 +2,8 @@
 	var MinerGame = window.MinerGame || (window.MinerGame = {});
 	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
-	MinerGame.Component.Backpack = function(game, custWorld) {
+	MinerGame.Component.Backpack = function(player, game, custWorld) {
+		this.player = player;
 		this.game = game;
 		this.custWorld = custWorld;
 		
@@ -17,6 +18,7 @@
 		
 		this.backpack_rect = null;
 		
+		this.box_corner_radius = 6;   // radius of box corners
 		this.box_margin = 16;   // margin from side of game
 		this.box_padding = 8;   // padding from box to box items
 		this.box_slot_padding = 6;   // padding from box slot container to sprite
@@ -26,6 +28,7 @@
 		this.box_background_alpha = 0.8;
 		this.box_slot_background_color = 0x333333;
 		this.box_slot_background_alpha = 0.5;
+		this.box_slot_corner_radius = 6;
 		this.box_slot_selected_background_color = 0x333333;
 		this.box_slot_selected_border_width = 1;
 		this.box_slot_selected_border_color = 0xFFFC00;
@@ -78,6 +81,10 @@
 			this.box_slots[ i ].draw_text.alpha = 0;
 			this.box_slots[ i ].draw_text.setShadow(0, 0, 'rgba(0, 0, 0, 0.5)', 0);
 		}
+		
+		// starter tools
+		this.addTool("wood_shovel");
+		this.addTool("wood_pickaxe");
 	};
 	
 	MinerGame.Component.Backpack.prototype.draw = function() {
@@ -87,11 +94,8 @@
 		// backpack background
 		this.box_graphic.beginFill(this.box_background_color);
 		this.box_graphic.fillAlpha = this.box_background_alpha;
-		this.box_graphic.drawRect(0, 0, this.backpack_rect.width, this.backpack_rect.height);
-		//this.box_graphic.moveTo(0, 0);
-		//this.box_graphic.lineTo(this.backpack_rect.width, 0);
-		//this.box_graphic.lineTo(this.backpack_rect.width, this.backpack_rect.height);
-		//this.box_graphic.lineTo(0, this.backpack_rect.height);
+		//this.box_graphic.drawRect(0, 0, this.backpack_rect.width, this.backpack_rect.height);
+		this.box_graphic.drawRoundedRect(0, 0, this.backpack_rect.width, this.backpack_rect.height, this.box_corner_radius);
 		this.box_graphic.endFill();
 		
 		// item boxes
@@ -111,10 +115,12 @@
 			}
 			
 			this.box_graphic.fillAlpha = this.box_slot_background_alpha;
-			this.box_graphic.moveTo(rect.topLeft.x, rect.topLeft.y);
+			//this.box_graphic.drawRect(rect.x, rect.y, rect.width, rect.height);
+			this.box_graphic.drawRoundedRect(rect.x, rect.y, rect.width, rect.height, this.box_slot_corner_radius);
+			/*this.box_graphic.moveTo(rect.topLeft.x, rect.topLeft.y);
 			this.box_graphic.lineTo(rect.topRight.x, rect.topRight.y);
 			this.box_graphic.lineTo(rect.bottomRight.x, rect.bottomRight.y);
-			this.box_graphic.lineTo(rect.bottomLeft.x, rect.bottomLeft.y);
+			this.box_graphic.lineTo(rect.bottomLeft.x, rect.bottomLeft.y);*/
 			this.box_graphic.endFill();
 		}
 	};
@@ -171,9 +177,9 @@
 			return false;
 		}
 		
-		var tile_info = tile_types[ item_name ];
+		var item = tile_types[ item_name ];
 		
-		if(!tile_info.type || ("tool" !== tile_info.type)) {
+		if(!item.type || ("tool" !== item.type)) {
 			return false;
 		}
 		
@@ -196,12 +202,12 @@
 			this.inventory[ invIndex ] = {
 				'item_name': item_name,
 				'quantity': add_quantity,
-				'type': tile_info.type
+				'type': item.type
 			};
 			
 			if(this.box_slots[ invIndex ]) {
 				this.box_slots[ invIndex ].type = item_name;
-				this.box_slots[ invIndex ].sprite.frame = tile_info.sprites[0];   // default sprite
+				this.box_slots[ invIndex ].sprite.frame = item.sprites[0];   // default sprite
 			}
 		}
 		
@@ -245,6 +251,16 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.useSelectedItemSlot = function(tileX, tileY) {
+		//console.log("useSelectedItemSlot: "+ tileX +", "+ tileY);
+		
+		// make sure activePointer is still at tileX, tileY
+		var activePointerTileX = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
+		var activePointerTileY = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
+		
+		if((activePointerTileX != tileX) || (activePointerTileY != tileY)) {
+			return;
+		}
+		
 		if(!this.inventory[ this.selected_slot ]) {
 			return;
 		}
@@ -273,6 +289,7 @@
 				//this.useInventory(this.selected_slot);
 				
 				this.updateItemBoxes();
+				//this.player.positionTool();
 			}
 			
 			return;
@@ -285,6 +302,8 @@
 			
 			this.useInventory(this.selected_slot);
 			this.custWorld.replaceTile(tileX, tileY, selected_inventory_item.item_name);
+			
+			this.player.positionTool();
 			
 			return;
 		}
@@ -358,38 +377,40 @@
 		
 		// redraw bottom inventory
 		this.draw();
+		
+		// reposition player tool
+		this.player.positionTool();
 	};
 	
 	MinerGame.Component.Backpack.prototype.getActiveItem = function() {
-		if(!this.inventory[ this.selected_slot ]) {
-			return null;
-		}
-		
-		return this.inventory[ this.selected_slot ];
+		return this.inventory[ this.selected_slot ] || null;
 	};
 	
-	MinerGame.Component.Backpack.prototype.capturedClick = function(screenX, screenY) {
+	MinerGame.Component.Backpack.prototype.captureClick = function() {
+		var cameraX = (this.game.input.activePointer.worldX - this.game.camera.view.x);
+		var cameraY = (this.game.input.activePointer.worldY - this.game.camera.view.y);
+		
 		// check if click is inside backpack, if so do logic and capture (return true), otherwise release click (return false)
-		if(!this.backpack_rect.contains(screenX, screenY)) {
+		if(!this.backpack_rect.contains(cameraX, cameraY)) {
+			//console.log("backpack(["+ this.backpack_rect.x +","+ this.backpack_rect.y +"],["+ (this.backpack_rect.x + this.backpack_rect.width) +","+ (this.backpack_rect.y + this.backpack_rect.height) +"]) not contain "+ cameraX +","+ cameraY);
+			
 			return false;
 		}
 		
 		// determine which box slot is clicked
-		var relativeX = (screenX - this.backpack_rect.topLeft.x);
-		var relativeY = (screenY - this.backpack_rect.topLeft.y);
+		var relativeX = (cameraX - this.backpack_rect.topLeft.x);
+		var relativeY = (cameraY - this.backpack_rect.topLeft.y);
 		var invIndex = null;
 		
-		_.each(this.box_slots, function(value, index) {
+		_.each(this.box_slots, function(box_slot, index) {
 			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
-			if((null === invIndex) && value.container.contains(relativeX, relativeY)) {
+			if((null === invIndex) && box_slot.container.contains(relativeX, relativeY)) {
 				invIndex = index;
 			}
 		});
 		
 		if(null !== invIndex) {
 			this.setActiveItemSlot(invIndex);
-			
-			return true;
 		}
 		
 		return true;

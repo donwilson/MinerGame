@@ -31,6 +31,11 @@
 			this.game.scale.pageAlignVertically = true;
 		}
 		
+		this.game.canvas.oncontextmenu = function(e) {
+			// prevent right click contextmenu
+			e.preventDefault();
+		};
+		
 		//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 		//this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
 		this.game.scale.refresh();
