@@ -2,7 +2,7 @@
 	var MinerGame = window.MinerGame || (window.MinerGame = {});
 	MinerGame.Entity = window.MinerGame.Entity || (window.MinerGame.Entity = {});
 	
-	MinerGame.Entity.Player = function(game, custWorld) {
+	MinerGame.Entity.Player = function(game, custWorld, selected_character) {
 		this.game = game;
 		this.custWorld = custWorld;
 		
@@ -10,7 +10,7 @@
 			'tool':  null
 		};
 		
-		this.character = this.pickCharacter();
+		this.character = this.pickCharacter(selected_character);
 		this.spawn = this.custWorld.getSpawn();
 		this.backpack = new MinerGame.Component.Backpack(this, this.game, this.custWorld);
 		
@@ -20,7 +20,7 @@
 		this.stopping_jump = false;
 		this.jump_delay = 200;   // MS between landing and ability to jump again
 		
-		Phaser.Sprite.call(this, game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
+		Phaser.Sprite.call(this, this.game, (this.spawn.x * TILE_WIDTH), (this.spawn.y * TILE_HEIGHT), this.character.spritesheet, this.character.default_frame);
 		
 		// add generated player to game
 		this.game.add.existing(this);
@@ -46,7 +46,7 @@
 		// tool
 		var active_backpack_item = this.backpack.getActiveItem();
 		
-		this.tool = this.addChild(game.make.sprite(0, 0, 'world', tile_types.air.sprites[0]));
+		this.tool = this.addChild(game.make.sprite(0, 0, 'world', MinerGame.Data.tile_types.air.sprites[0]));
 		this.positionTool();
 		
 		// controls
@@ -136,6 +136,9 @@
 		if(this.game.input.activePointer.leftButton.isDown) {
 			this.processMouseDown();
 		}
+		
+		// update backpack
+		this.backpack.update();
 	};
 	
 	MinerGame.Entity.Player.prototype.faceLeft = function() {
@@ -168,7 +171,7 @@
 		}
 		
 		var item_name = backpack_active_item.item_name;
-		var item = tile_types[ item_name ];
+		var item = MinerGame.Data.tile_types[ item_name ];
 		
 		if(("tile" === item.type) && ("air" === item_name)) {
 			// hide air
@@ -216,7 +219,7 @@
 	MinerGame.Entity.Player.prototype.calculateToolAngle = function(desired_angle) {
 		var angle_calc = 0;
 		
-		angle_calc -= tile_types[ this.tool.name ].angle_offset;
+		angle_calc -= MinerGame.Data.tile_types[ this.tool.name ].angle_offset;
 		angle_calc += desired_angle;
 		
 		if(!this.facing_right) {
@@ -227,10 +230,16 @@
 		return this.game.math.wrapAngle(angle_calc);
 	};
 	
-	MinerGame.Entity.Player.prototype.pickCharacter = function() {
-		var picked_character = _.sample(_.keys(playable_characters));
+	MinerGame.Entity.Player.prototype.pickCharacter = function(selected_character) {
+		var picked_character;
 		
-		return _.extend({'key': picked_character}, playable_characters[ picked_character ]);
+		if(("undefined" !== typeof selected_character) && (null !== selected_character) && MinerGame.Data.playable_characters[ selected_character ]) {
+			picked_character = selected_character;
+		} else {
+			picked_character = _.sample(_.keys(MinerGame.Data.playable_characters));
+		}
+		
+		return _.extend({'key': picked_character}, MinerGame.Data.playable_characters[ picked_character ]);
 	};
 	
 	MinerGame.Entity.Player.prototype.maybeCrop = function() {
@@ -279,24 +288,16 @@
 		}
 		
 		
-		var tileX = this.custWorld.layer.getTileX(worldX);
-		var tileY = this.custWorld.layer.getTileY(worldY);
-		
-		var playerTileX = this.custWorld.layer.getTileX(this.centerX);
-		var playerTileY = this.custWorld.layer.getTileY(this.centerY);
-		
-		if((tileX == playerTileX) && (tileY == playerTileY)) {
-			// too close
-			return;
-		}
-		
-		
 		// attempt to use active item in backpack
 		var backpack_active_item = this.backpack.getActiveItem();
 		
 		if(null === backpack_active_item) {
 			return;
 		}
+		
+		// which tile you're hitting
+		var tileX = this.custWorld.layer.getTileX(worldX);
+		var tileY = this.custWorld.layer.getTileY(worldY);
 		
 		if(backpack_active_item.type && ("tool" === backpack_active_item.type)) {
 			// cant use tool while jumping (for now)
@@ -315,6 +316,14 @@
 			// future...
 			
 		} else {
+			var playerTileX = this.custWorld.layer.getTileX(this.centerX);
+			var playerTileY = this.custWorld.layer.getTileY(this.centerY);
+			
+			if((tileX == playerTileX) && (tileY == playerTileY)) {
+				// too close for placing tiles
+				return;
+			}
+			
 			this.backpack.useSelectedItemSlot(tileX, tileY);
 		}
 	};
@@ -348,13 +357,13 @@
 		
 		var backpack_active_item = this.backpack.getActiveItem();
 		
-		var angle_start = this.calculateToolAngle(tile_types[ backpack_active_item.item_name ].angle_resting);
-		var angle_end = this.calculateToolAngle(tile_types[ backpack_active_item.item_name ].angle_max);
+		var angle_start = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_resting);
+		var angle_end = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_max);
 		
 		this.tool.angle = angle_start;
 		
-		//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenStart");
-		//console.log("tool["+ backpack_active_item.item_name +"].angle_max     = "+ tile_types[ backpack_active_item.item_name ].angle_max +" (calc: "+ angle_end +") :: player.animateTool.tweenTo");
+		//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenStart");
+		//console.log("tool["+ backpack_active_item.item_name +"].angle_max     = "+ MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_max +" (calc: "+ angle_end +") :: player.animateTool.tweenTo");
 		
 		//Phaser.Tween.to(properties [, duration] [, ease] [, autoStart] [, delay] [, repeat] [, yoyo])
 		this.tweens.tool = this.game.add.tween(this.tool);
@@ -364,7 +373,7 @@
 		
 		this.tweens.tool.onComplete.add(function(target, tween) {
 			//target.alpha = 0;
-			//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenComplete");
+			//console.log("tool["+ backpack_active_item.item_name +"].angle_resting = "+ MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_resting +" (calc: "+ angle_start +") :: player.animateTool.tweenComplete");
 			target.angle = angle_start;
 			
 			//if(callable_done) {
@@ -375,3 +384,4 @@
 			this.tweens.tool = null;
 		}, this);
 	};
+	

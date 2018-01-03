@@ -8,7 +8,8 @@
 		this.type = type;
 		this.x = x;
 		this.y = y;
-		this.sprite = 0;
+		this.sprite = MinerGame.Data.missing_tile_sprite;
+		this.inventory_sprite = MinerGame.Data.missing_tile_sprite;
 		this.properties = {};
 		this.collides = false;
 		this.strength = 1;
@@ -25,10 +26,23 @@
 	MinerGame.Component.WorldTile.prototype.constructor = MinerGame.Component.WorldTile;
 	
 	MinerGame.Component.WorldTile.prototype.create = function() {
-		this.sprite = Phaser.ArrayUtils.getRandomItem( tile_types[ this.type ].sprites );
-		this.properties = tile_types[ this.type ].properties;
-		this.collides = tile_types[ this.type ].collide || false;
-		this.strength = tile_types[ this.type ].properties.strength;
+		var tile_data = MinerGame.Data.tile_types[ this.type ];
+		
+		if(!_.isUndefined(tile_data.sprites) && tile_data.sprites.length) {
+			// pick sprite from this tile's sprite list
+			this.sprite = this.game.rnd.pick( tile_data.sprites );
+		}
+		
+		// which sprite to show when added to inventory
+		this.inventory_sprite = this.sprite;
+		
+		if(!_.isUndefined(tile_data.inventory_sprite)) {
+			this.inventory_sprite = tile_data.inventory_sprite;
+		}
+		
+		this.properties = tile_data.properties;
+		this.collides = tile_data.collide || false;
+		this.strength = tile_data.properties.strength;
 		this.health = this.strength;
 	};
 	
@@ -80,11 +94,10 @@
 		// cancel previous timer (if any)
 		this.cancelHitTimer();
 		
-		var random_timer_key = Math.ceil((Math.random() * 10000));
-		this.timer_key = random_timer_key;
+		this.timer_key = this.game.rnd.uuid();
 		
 		//add(delayMS, callback, callbackContext[, arguments]<repeatable>)
-		this.game.time.events.add(3000, this.resetTileHealth, this, random_timer_key);
+		this.game.time.events.add(3000, this.resetTileHealth, this, this.timer_key);
 	};
 	
 	MinerGame.Component.WorldTile.prototype.cancelHitTimer = function() {

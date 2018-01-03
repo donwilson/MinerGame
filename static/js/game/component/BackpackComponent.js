@@ -36,6 +36,18 @@
 		this.box_slot_selected_border_alpha = 0.5;
 		
 		this.create();
+		
+		// keypress callbacks
+		this.keys = this.game.input.keyboard.addKeys({
+			'one': Phaser.Keyboard.ONE,
+			'two': Phaser.Keyboard.TWO,
+			'three': Phaser.Keyboard.THREE,
+			'four': Phaser.Keyboard.FOUR,
+			'five': Phaser.Keyboard.FIVE,
+			'six': Phaser.Keyboard.SIX,
+			'seven': Phaser.Keyboard.SEVEN,
+			'eight': Phaser.Keyboard.EIGHT
+		});
 	};
 	
 	MinerGame.Component.Backpack.prototype = Object.create(Phaser.Component.prototype);
@@ -60,7 +72,7 @@
 			rect = this.getItemBoxRelativeRect(i);
 			
 			this.box_slots[ i ] = {
-				'sprite': this.game.add.sprite(0, 0, 'world', Phaser.ArrayUtils.getRandomItem(tile_types.air.sprites)),
+				'sprite': this.game.add.sprite(0, 0, 'world', MinerGame.Data.tile_types.air.sprites[0]),
 				'type': "air",
 				'draw_text': this.game.add.text(0, 0, "", {
 					'font': "10px Verdana",
@@ -86,6 +98,28 @@
 		// starter tools
 		this.addTool("wood_shovel");
 		this.addTool("wood_pickaxe");
+		this.addTool("wood_axe");
+	};
+	
+	MinerGame.Component.Backpack.prototype.update = function() {
+		// change active item slots based on pressing keys 1-8
+		if(this.keys.one.isDown) {
+			this.setActiveItemSlot(0);
+		} else if(this.keys.two.isDown) {
+			this.setActiveItemSlot(1);
+		} else if(this.keys.three.isDown) {
+			this.setActiveItemSlot(2);
+		} else if(this.keys.four.isDown) {
+			this.setActiveItemSlot(3);
+		} else if(this.keys.five.isDown) {
+			this.setActiveItemSlot(4);
+		} else if(this.keys.six.isDown) {
+			this.setActiveItemSlot(5);
+		} else if(this.keys.seven.isDown) {
+			this.setActiveItemSlot(6);
+		} else if(this.keys.eight.isDown) {
+			this.setActiveItemSlot(7);
+		}
 	};
 	
 	MinerGame.Component.Backpack.prototype.draw = function() {
@@ -126,21 +160,28 @@
 		}
 	};
 	
-	MinerGame.Component.Backpack.prototype.addItem = function(item, add_quantity) {
-		if(!item || !item.type || ("air" === item.type)) {
+	MinerGame.Component.Backpack.prototype.addItem = function(item_name, add_quantity) {
+		if(!item_name || ("air" === item_name)) {
 			return;
 		}
 		
+		if(_.isUndefined(MinerGame.Data.tile_types[ item_name ])) {
+			console.error("Unknown tile_type '"+ item_name +"'");
+			
+			return;
+		}
+		
+		var tile_data = MinerGame.Data.tile_types[ item_name ];
 		add_quantity = add_quantity || 1;
 		
 		var invIndex = null;
 		var backupIndex = null;
 		
 		_.each(this.inventory, function(value, index) {
-			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
-			if(value.item_name === item.type) {
+			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
+			if(value.item_name === item_name) {
 				invIndex = index;
-			} else if((null === invIndex) && ("air" === value.item_name) && (null === backupIndex)) {
+			} else if((null === invIndex) && (null === backupIndex) && ("air" === value.item_name)) {
 				backupIndex = index;
 			}
 		});
@@ -159,14 +200,19 @@
 			}
 			
 			this.inventory[ invIndex ] = {
-				'item_name': item.type,
+				'item_name': item_name,
 				'quantity': add_quantity,
 				'type': "tile"
 			};
 			
 			if(this.box_slots[ invIndex ]) {
-				this.box_slots[ invIndex ].type = item.type;
-				this.box_slots[ invIndex ].sprite.frame = tile_types[ item.type ].sprites[0];   // default sprite
+				this.box_slots[ invIndex ].type = item_name;
+				
+				if(!_.isUndefined(MinerGame.Data.tile_types[ item_name ].inventory_sprite)) {
+					this.box_slots[ invIndex ].sprite.frame = MinerGame.Data.tile_types[ item_name ].inventory_sprite;   // inventory sprite
+				} else {
+					this.box_slots[ invIndex ].sprite.frame = MinerGame.Data.tile_types[ item_name ].sprites[0];   // default sprite
+				}
 			}
 		}
 		
@@ -174,11 +220,11 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.addTool = function(item_name, add_quantity) {
-		if(!tile_types[ item_name ]) {
+		if(!MinerGame.Data.tile_types[ item_name ]) {
 			return false;
 		}
 		
-		var item = tile_types[ item_name ];
+		var item = MinerGame.Data.tile_types[ item_name ];
 		
 		if(!item.type || ("tool" !== item.type)) {
 			return false;
@@ -189,7 +235,7 @@
 		var invIndex = null;
 		
 		_.each(this.inventory, function(value, index) {
-			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
+			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
 			if(value.item_name === item.type) {
 				invIndex = index;
 			}
@@ -224,7 +270,7 @@
 		
 		if(this.box_slots[ slot ]) {
 			this.box_slots[ slot ].type = "air";
-			this.box_slots[ slot ].sprite.frame = tile_types['air'].sprites[0];
+			this.box_slots[ slot ].sprite.frame = MinerGame.Data.tile_types['air'].sprites[0];
 		}
 	};
 	
@@ -274,15 +320,15 @@
 		}
 		
 		var tile_hit = this.custWorld.getTile(tileX, tileY);
-		var tile_holding = tile_types[ selected_inventory_item.item_name ];
+		var item_holding = MinerGame.Data.tile_types[ selected_inventory_item.item_name ];
 		
-		if("tool" === tile_holding.type) {
-			// use a tool
+		if("tool" === item_holding.type) {
+			// use tool
 			if("air" === tile_hit.type) {
 				return;
 			}
 			
-			if(tile_holding && tile_holding.properties && tile_holding.properties.effective_tiles && tile_holding.properties.effective_tiles.length && (-1 !== _.indexOf(tile_holding.properties.effective_tiles, tile_hit.type))) {
+			if(item_holding && item_holding.properties && item_holding.properties.effective_tiles && item_holding.properties.effective_tiles.length && (-1 !== _.indexOf(item_holding.properties.effective_tiles, tile_hit.type))) {
 				// tool can be used against this
 				//console.log("tile_hit.strength = ", tile_hit.strength);
 				//console.log("tile_hit.health = ", tile_hit.health);
@@ -292,9 +338,22 @@
 					return;
 				}
 				
-				if(true === this.custWorld.hitTile(tileX, tileY, tile_holding.properties.strength)) {
+				if(true === this.custWorld.hitTile(tileX, tileY, item_holding.properties.strength)) {
 					// broke tile, add to inventory
-					this.addItem(tile_hit);
+					//console.log("tile_hit=", tile_hit);
+					
+					if(!_.isUndefined(tile_hit.properties.drops)) {
+						// this tile breaks up into different 'drops', iterate over and add each
+						_.each(tile_hit.properties.drops, function(drop) {
+							var drop_quantity = drop.quantity || 1;
+							
+							this.addItem(drop.type, drop_quantity);
+						}, this);
+					} else {
+						// add this tile to inventory
+						this.addItem(tile_hit.type);
+					}
+					
 					//this.custWorld.replaceTile(tileX, tileY, "air");
 					//this.useInventory(this.selected_slot);
 					this.updateItemBoxes();
@@ -303,7 +362,7 @@
 			}
 			
 			return;
-		} else if("tile" === tile_holding.type) {
+		} else if("tile" === item_holding.type) {
 			// place a tile
 			if("air" !== tile_hit.type) {
 				// cant overwrite non-air
@@ -413,7 +472,7 @@
 		var invIndex = null;
 		
 		_.each(this.box_slots, function(box_slot, index) {
-			// @TODO max quantity per slot (based on tile_types.max_inventory_slot_quantity?)
+			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
 			if((null === invIndex) && box_slot.container.contains(relativeX, relativeY)) {
 				invIndex = index;
 			}
@@ -447,5 +506,11 @@
 		}
 		
 		this.setActiveItemSlot(new_selected_slot);
+	};
+	
+	MinerGame.Component.Backpack.prototype.handleKeyDown = function(event) {
+		console.log("Backpack.handleKeyDown.event = ", event);
+		
+		//this.setActiveItemSlot(new_selected_slot);
 	};
 	

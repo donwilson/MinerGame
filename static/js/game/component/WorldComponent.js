@@ -28,7 +28,8 @@
 		this.applyRawTiles(world_generator.getTiles());
 		
 		// set spawn
-		this.setSpawn(world_generator.getTopSpawnablePoints());
+		//this.setSpawn(world_generator.getTopSpawnablePoints());
+		this.setSpawn(world_generator.getPlayerSpawn());
 		
 		// add world data to game cache
 		this.game.cache.addTilemap('dynamicMap', null, this.toJSON(), Phaser.Tilemap.TILED_JSON);
@@ -72,7 +73,7 @@
 		var new_world_tile = new MinerGame.Component.WorldTile(this.game, this, x, y, new_tile_type);
 		var newTile = new Phaser.Tile(this.layer, new_world_tile.getTileSprite(), x, y, TILE_WIDTH, TILE_HEIGHT);
 		
-		this.map.removeTile(x, y, this.layer);
+		//this.map.removeTile(x, y, this.layer);
 		this.map.putTile(newTile, x, y, this.layer);
 		
 		this.tiles[ y ][ x ] = new_world_tile;
@@ -106,8 +107,8 @@
 		return true;
 	};
 	
-	MinerGame.Component.World.prototype.setSpawn = function(points) {
-		this.spawn = this.game.rnd.pick(points);
+	MinerGame.Component.World.prototype.setSpawn = function(point) {
+		this.spawn = point;
 	};
 	
 	MinerGame.Component.World.prototype.getSpawn = function() {
@@ -119,15 +120,12 @@
 	MinerGame.Component.World.prototype.getTileSpritesNotCollideableWithPlayer = function() {
 		// build index of tile sprites that don't collide with player
 		var sprites = [];
-		var key;
 		
-		for(key in tile_types) {
-			if(tile_types.hasOwnProperty(key)) {
-				if(!tile_types[ key ].collide && tile_types[ key ].sprites.length) {
-					sprites = sprites.concat( tile_types[ key ].sprites );
-				}
+		_.each(MinerGame.Data.tile_types, function(value, key) {
+			if(!value.collide && value.sprites.length) {
+				sprites = sprites.concat( value.sprites );
 			}
-		}
+		});
 		
 		return sprites;
 	};
@@ -135,15 +133,12 @@
 	MinerGame.Component.World.prototype.getTileSpritesCollideableWithPlayer = function() {
 		// build index of tile sprites that collide with player
 		var sprites = [];
-		var key;
 		
-		for(key in tile_types) {
-			if(tile_types.hasOwnProperty(key)) {
-				if(tile_types[ key ].collide && tile_types[ key ].sprites.length) {
-					sprites = sprites.concat( tile_types[ key ].sprites );
-				}
+		_.each(MinerGame.Data.tile_types, function(value, key) {
+			if(value.collide && value.sprites.length) {
+				sprites = sprites.concat( value.sprites );
 			}
-		}
+		});
 		
 		return sprites;
 	};

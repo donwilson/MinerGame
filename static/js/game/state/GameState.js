@@ -5,9 +5,8 @@
 	MinerGame.State.Game = function() {
 		this.custWorld = null;
 		
-		this.fullscreenButton = null;
-		
 		this.background = null;
+		this.desired_character = null;
 		this.player = null;
 		
 		Phaser.State.call(this);
@@ -16,9 +15,14 @@
 	MinerGame.State.Game.prototype = Object.create(Phaser.State.prototype);
 	MinerGame.State.Game.prototype.constructor = MinerGame.State.Game;
 	
-	MinerGame.State.Game.prototype.init = function() {
+	MinerGame.State.Game.prototype.init = function(selected_character) {
 		// set stage bg
 		this.game.stage.backgroundColor = "#10151d";
+		
+		// character selected from menu?
+		if(("undefined" !== typeof selected_character) && (null !== selected_character)) {
+			this.desired_character = selected_character;
+		}
 	};
 	
 	MinerGame.State.Game.prototype.create = function() {
@@ -32,11 +36,12 @@
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		
 		// make world
-		this.custWorld = new MinerGame.Component.World(this.game, this.game.rnd.between(150, 200), this.game.rnd.between(300, 350), 5);
+		//this.custWorld = new MinerGame.Component.World(this.game, this.game.rnd.between(150, 200), this.game.rnd.between(300, 350), 35);
+		this.custWorld = new MinerGame.Component.World(this.game, this.game.rnd.between(60, 80), this.game.rnd.between(80, 100), 35);
 		//this.custWorld = new MinerGame.Component.World(this.game, 30, 30, 5);
 		
 		// player
-		this.player = new MinerGame.Entity.Player(this.game, this.custWorld);
+		this.player = new MinerGame.Entity.Player(this.game, this.custWorld, this.desired_character);
 		
 		// make camera follow player
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
@@ -57,9 +62,9 @@
 		this.game.physics.arcade.collide(this.player, this.custWorld.layer);
 	};
 	
-	MinerGame.State.Game.prototype.render = function() {
-		
-	};
+	//MinerGame.State.Game.prototype.render = function() {
+	//	
+	//};
 	
 	
 	

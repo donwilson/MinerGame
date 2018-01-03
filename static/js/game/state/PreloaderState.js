@@ -14,6 +14,7 @@
 		
 		this.graphic_container = null;
 		this.graphic_progress = null;
+		this.loading_text = null;
 	};
 	
 	MinerGame.State.Preloader.prototype = Object.create(Phaser.State.prototype);
@@ -24,6 +25,25 @@
 		
 		// set stage bg
 		this.game.stage.backgroundColor = "#10151d";
+		
+		// bar rectangle
+		var bar_width = (this.game.camera.view.width * 0.7);
+		var bar_height = 10;
+		
+		this.rect_progress = new Phaser.Rectangle(
+			(this.game.camera.view.centerX - (bar_width / 2)),
+			(this.game.camera.view.centerY - (bar_height / 2)),
+			bar_width,
+			bar_height
+		);
+		
+		this.loading_text = this.game.add.text(0, 0, "Loading...", {
+			'font': "normal 12px Verdana",
+			'fill': "#ffffff",
+			'boundsAlignH': "center",
+			'boundsAlignV': "bottom"
+		});
+		this.loading_text.setTextBounds(0, 0, this.game.width, (this.rect_progress.y - 10));
 	};
 	
 	MinerGame.State.Preloader.prototype.preload = function() {
@@ -32,14 +52,16 @@
 		this.game.load.onFileComplete.add(this.onFileComplete, this);
 		this.game.load.onLoadComplete.add(this.onLoadComplete, this);
 		
+		// load assets
 		this.game.load.image('background', "/static/images/background.jpg");
+		this.game.load.image('logo', "/static/images/logo.png");
 		this.game.load.spritesheet('world', "/static/images/world.png", TILE_WIDTH, TILE_HEIGHT);
-		this.game.load.spritesheet('button_sprite', "/static/images/button-sprite.png", 32, 32);
+		this.game.load.spritesheet('buttons', "/static/images/buttons.png", 32, 32);
 	};
 	
-	//MinerGame.State.Preloader.prototype.create = function() {
-	//	
-	//};
+	MinerGame.State.Preloader.prototype.create = function() {
+		
+	};
 	
 	MinerGame.State.Preloader.prototype.setProgressBar = function(progress) {
 		progress = this.game.math.clamp(progress, 0, 100);
@@ -58,16 +80,6 @@
 	};
 	
 	MinerGame.State.Preloader.prototype.onLoadStart = function() {
-		var bar_width = this.game.camera.view.width * 0.7;
-		var bar_height = 10;
-		
-		this.rect_progress = new Phaser.Rectangle(
-			(this.game.camera.view.centerX - (bar_width / 2)),
-			(this.game.camera.view.centerY - (bar_height / 2)),
-			bar_width,
-			bar_height
-		);
-		
 		this.graphic_container = this.game.add.graphics(
 			(this.rect_progress.x - this.container_padding),
 			(this.rect_progress.y - this.container_padding)
@@ -101,6 +113,8 @@
 	MinerGame.State.Preloader.prototype.onLoadComplete = function() {
 		this.setProgressBar(100);
 		
-		this.state.start('MainMenu');
+		this.game.time.events.add((Phaser.Timer.SECOND * 1), function() {
+			this.state.start('MainMenu');
+		}, this);
 	};
 	
