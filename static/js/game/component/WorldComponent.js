@@ -2,16 +2,23 @@
 	var MinerGame = window.MinerGame || (window.MinerGame = {});
 	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
-	MinerGame.Component.World = function(game, num_tiles_x, num_tiles_y, max_sky) {
+	MinerGame.Component.World = function(game, desired_character, num_tiles_x, num_tiles_y, max_sky) {
 		this.game = game;
 		this.map = null;
 		this.layer = null;
+		
+		this.background = null;
 		
 		this.tiles = [];
 		this.width = num_tiles_x || 100;
 		this.height = num_tiles_y || 250;
 		this.height_sky = max_sky || 30;
 		this.spawn = null;
+		
+		this.desired_character = desired_character;
+		
+		this.tile_drops = null;
+		this.player = null;
 		
 		this.create();
 	};
@@ -20,6 +27,13 @@
 	MinerGame.Component.World.prototype.constructor = MinerGame.Component.World;
 	
 	MinerGame.Component.World.prototype.create = function() {
+		// background
+		this.background = this.game.add.image(0, 0, 'background');
+		this.background.fixedToCamera = true;
+		
+		// arcade physics
+		this.game.physics.startSystem(Phaser.Physics.ARCADE);
+		
 		// create world
 		var world_generator = new MinerGame.Component.WorldGenerator(this.game, this.width, this.height, this.height_sky);
 		world_generator.create();
@@ -48,6 +62,42 @@
 		
 		// set collisions
 		this.updateCollision();
+		
+		// tile drops group
+		this.tile_drops = this.game.add.group();
+		
+		// player
+		this.player = new MinerGame.Entity.Player(this.game, this, this.desired_character);
+		
+		// make camera follow player
+		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
+		
+		// enable gravity
+		this.game.physics.arcade.gravity.y = (TILE_HEIGHT * 9.8 * 2);
+		
+		// input callbacks
+		//this.game.input.addMoveCallback(this.handleMouseMove, this);
+		this.game.input.activePointer.leftButton.onDown.add(this.handleLeftClick, this);
+		this.game.input.activePointer.rightButton.onDown.add(this.handleRightClick, this);
+		//this.game.input.mouse.capture = true;   // prevent scrolling the window ["If true the DOM mouse events will have event.preventDefault applied to them, if false they will propagate fully."]
+		
+		// mouseWheelCallback doesn't keep instance context, so make self reference
+		this.game.input.mouse.mouseWheelCallback = this.handleMouseWheel(this);
+	};
+	
+	MinerGame.Component.World.prototype.update = function() {
+		// update collisions
+		this.game.physics.arcade.collide(this.player, this.layer);
+		this.game.physics.arcade.collide(this.tile_drops, this.layer);
+		
+		// overlap(object1, object2 [, overlapCallback] [, processCallback] [, callbackContext])
+		this.game.physics.arcade.overlap(this.player, this.tile_drops, this.player.handleItemDropPickup, null, this.player);
+	};
+	
+	MinerGame.Component.World.prototype.emitItemDrop = function(tile_type, quantity, tileX, tileY) {
+		quantity = quantity || 1;
+		
+		this.tile_drops.add(new MinerGame.Entity.TileDrop(this.game, this, tile_type, tileX, tileY, quantity));
 	};
 	
 	MinerGame.Component.World.prototype.applyRawTiles = function(raw_tiles) {
@@ -268,3 +318,45 @@
 		};
 	};
 	
+	
+	// mouse move
+	MinerGame.Component.World.prototype.handleMouseMove = function() {
+		//var tile_x = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
+		//var tile_y = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
+		
+		
+	};
+	
+	// left mouse click
+	MinerGame.Component.World.prototype.handleLeftClick = function() {
+		if(!this.game.input.activePointer.withinGame) {
+			// mouse outside of game canvas
+			return;
+		}
+		
+		// check if click is in backpack
+		if(this.player.captureClick()) {
+			return;
+		}
+	};
+	
+	// right mouse click
+	MinerGame.Component.World.prototype.handleRightClick = function() {
+		if(!this.game.input.activePointer.withinGame) {
+			// mouse outside of game canvas
+			return;
+		}
+		
+		// @TMP debug
+		console.log("item drops: ", this.tile_drops);
+	};
+	
+	
+	
+	// mouse wheel
+	MinerGame.Component.World.prototype.handleMouseWheel = function(context) {
+		return function() {
+			// player capture scroll
+			context.player.captureMouseWheel();
+		};
+	};

@@ -26,11 +26,9 @@
 		this.game.add.existing(this);
 		
 		// animations
-		for(var key in this.character.animations) {
-			if(this.character.animations.hasOwnProperty(key)) {
-				this.animations.add(key, this.character.animations[ key ].frames, this.character.animations[ key ].speed, true);
-			}
-		}
+		_.each(this.character.animations, function(animation, key) {
+			this.animations.add(key, animation.frames, animation.speed, true);
+		}, this);
 		
 		// crop sprite to contain just image
 		this.maybeCrop();
@@ -40,7 +38,6 @@
 		
 		// physics
 		this.body.bounce.y = 0;
-		this.body.linearDamping = 1;
 		this.body.collideWorldBounds = true;
 		
 		// tool
@@ -134,7 +131,7 @@
 		
 		// mouse down
 		if(this.game.input.activePointer.leftButton.isDown) {
-			this.processMouseDown();
+			this.processMouseLeftDown();
 		}
 		
 		// update backpack
@@ -270,7 +267,17 @@
 		return this.game.math.distance(this.centerX, this.centerY, x, y);
 	};
 	
-	MinerGame.Entity.Player.prototype.processMouseDown = function() {
+	MinerGame.Entity.Player.prototype.handleItemDropPickup = function(player, item_drop) {
+		// player item drop pickup
+		
+		// add item to inventory
+		this.backpack.addItem(item_drop.getTileName(), item_drop.getQuantity());
+		
+		// kill item_drop sprite
+		item_drop.destroy();
+	};
+	
+	MinerGame.Entity.Player.prototype.processMouseLeftDown = function() {
 		if((null !== this.tweens.tool) && this.tweens.tool.isRunning) {
 			// tool is tweening, do nothing
 			return;
@@ -335,7 +342,7 @@
 			return;
 		}
 		
-		this.processMouseDown();
+		this.processMouseLeftDown();
 	};
 	
 	MinerGame.Entity.Player.prototype.captureMouseWheel = function() {

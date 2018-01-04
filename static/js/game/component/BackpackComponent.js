@@ -347,11 +347,14 @@
 						_.each(tile_hit.properties.drops, function(drop) {
 							var drop_quantity = drop.quantity || 1;
 							
-							this.addItem(drop.type, drop_quantity);
+							this.custWorld.emitItemDrop(drop.type, drop_quantity, tileX, tileY);
+							//this.addItem(drop.type, drop_quantity);
 						}, this);
 					} else {
 						// add this tile to inventory
-						this.addItem(tile_hit.type);
+						
+						this.custWorld.emitItemDrop(tile_hit.type, 1, tileX, tileY);
+						//this.addItem(tile_hit.type);
 					}
 					
 					//this.custWorld.replaceTile(tileX, tileY, "air");
