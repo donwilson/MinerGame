@@ -19,6 +19,9 @@
 		// once the event is ran, it compares against this value, and if it's not the same then it exits early
 		this.timer_key = null;
 		
+		
+		this.crack_sprite = null;
+		
 		this.create();
 	};
 	
@@ -76,10 +79,31 @@
 				return false;
 			}
 			
-			map_tile.alpha = (this.health / this.strength);
+			//map_tile.alpha = (this.health / this.strength);
+			//// tell map layer to redraw tiles since this map tile changed
+			//this.custWorld.requestTileUpdate();
 			
-			// tell map layer to redraw tiles since this map tile changed
-			this.custWorld.requestTileUpdate();
+			var amount_cracked = (1 - (this.health / this.strength));
+			
+			var crack_frame;
+			
+			if(amount_cracked >= 0.75) {
+				crack_frame = 1349;
+			} else if(amount_cracked >= 0.50) {
+				crack_frame = 1348;
+			} else if(amount_cracked >= 0.25) {
+				crack_frame = 1347;
+			} else {
+				crack_frame = 1346;
+			}
+			
+			//console.log("with amount_cracked = ", amount_cracked, ", crack_frame = ", crack_frame);
+			
+			if(null === this.crack_sprite) {
+				this.crack_sprite = this.game.add.sprite((this.x * TILE_WIDTH), (this.y * TILE_HEIGHT), 'world', crack_frame, this.custWorld.tile_cracks);
+			}
+			
+			this.crack_sprite.frame = crack_frame;
 			
 			// set timer to reset tile health after X seconds
 			this.startHitTimer();
@@ -119,13 +143,26 @@
 		// reset health
 		this.health = this.strength;
 		
-		// reset alpha
-		map_tile.alpha = 1;
+		//// reset alpha
+		//map_tile.alpha = 1;
+		//
+		//// tell map layer to refresh display
+		//this.custWorld.requestTileUpdate();
 		
-		// tell map layer to refresh display
-		this.custWorld.requestTileUpdate();
+		// destroy crack animation sprite
+		if(null !== this.crack_sprite) {
+			this.crack_sprite.destroy();
+			this.crack_sprite = null;
+		}
 		
 		// reset timer key
 		this.timer_key = null;
+	};
+	
+	MinerGame.Component.WorldTile.prototype.destroy = function() {
+		if(null !== this.crack_sprite) {
+			this.crack_sprite.destroy();
+			this.crack_sprite = null;
+		}
 	};
 	

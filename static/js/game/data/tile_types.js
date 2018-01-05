@@ -40,7 +40,7 @@
 			'collide': true,
 			'properties': {
 				'title': "Stone",
-				'strength': 3
+				'strength': 4
 			}
 		},
 		'ore': {

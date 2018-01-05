@@ -365,7 +365,9 @@
 			}
 			
 			return;
-		} else if("tile" === item_holding.type) {
+		}
+		
+		if("tile" === item_holding.type) {
 			// place a tile
 			if("air" !== tile_hit.type) {
 				// cant overwrite non-air
@@ -455,6 +457,7 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.getActiveItem = function() {
+		// return the currently selected item in backpack
 		return this.inventory[ this.selected_slot ] || null;
 	};
 	

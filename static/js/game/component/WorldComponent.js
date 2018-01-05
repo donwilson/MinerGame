@@ -18,6 +18,7 @@
 		this.desired_character = desired_character;
 		
 		this.tile_drops = null;
+		this.tile_cracks = null;
 		this.player = null;
 		
 		this.create();
@@ -65,6 +66,9 @@
 		
 		// tile drops group
 		this.tile_drops = this.game.add.group();
+		
+		// tile breaking animations group
+		this.tile_cracks = this.game.add.group();   // @TODO remove?
 		
 		// player
 		this.player = new MinerGame.Entity.Player(this.game, this, this.desired_character);
@@ -122,6 +126,11 @@
 		// replace tile
 		var new_world_tile = new MinerGame.Component.WorldTile(this.game, this, x, y, new_tile_type);
 		var newTile = new Phaser.Tile(this.layer, new_world_tile.getTileSprite(), x, y, TILE_WIDTH, TILE_HEIGHT);
+		
+		// get existing tile and destroy
+		if(!_.isUndefined(this.tiles[ y ]) && !_.isUndefined(this.tiles[ y ][ x ])) {
+			this.tiles[ y ][ x ].destroy();
+		}
 		
 		//this.map.removeTile(x, y, this.layer);
 		this.map.putTile(newTile, x, y, this.layer);
@@ -348,7 +357,8 @@
 		}
 		
 		// @TMP debug
-		console.log("item drops: ", this.tile_drops);
+		console.log("num item drops: ", this.tile_drops.children.length);
+		console.log("num item cracks: ", this.tile_cracks.children.length);
 	};
 	
 	
