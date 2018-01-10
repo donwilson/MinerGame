@@ -3,8 +3,6 @@
 	MinerGame.State = window.MinerGame.State || (window.MinerGame.State = {});
 	
 	MinerGame.State.MainMenu = function() {
-		this.startButton = null;
-		
 		Phaser.State.call(this);
 		
 		this.available_characters = _.keys(MinerGame.Data.playable_characters);

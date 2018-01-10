@@ -79,6 +79,9 @@
 		// enable gravity
 		this.game.physics.arcade.gravity.y = (TILE_HEIGHT * 9.8 * 2);
 		
+		// mini map
+		this.mini_map = new MinerGame.Component.MiniMap(this.game, this);
+		
 		// input callbacks
 		//this.game.input.addMoveCallback(this.handleMouseMove, this);
 		this.game.input.activePointer.leftButton.onDown.add(this.handleLeftClick, this);
@@ -96,6 +99,12 @@
 		
 		// overlap(object1, object2 [, overlapCallback] [, processCallback] [, callbackContext])
 		this.game.physics.arcade.overlap(this.player, this.tile_drops, this.player.handleItemDropPickup, null, this.player);
+		
+		this.mini_map.requestDraw();
+	};
+	
+	MinerGame.Component.World.prototype.render = function() {
+		
 	};
 	
 	MinerGame.Component.World.prototype.emitItemDrop = function(tile_type, quantity, tileX, tileY) {
@@ -136,12 +145,18 @@
 		this.map.putTile(newTile, x, y, this.layer);
 		
 		this.tiles[ y ][ x ] = new_world_tile;
+		
+		this.requestTileUpdate();
 	};
 	
 	MinerGame.Component.World.prototype.requestTileUpdate = function() {
 		// set the map layer 'dirty' so Phaser redraws it
 		// used when updating display aspects of tile(s)
-		this.layer.dirty = true;
+		// == not done anymore because replaceTile() works:
+		//this.layer.dirty = true;
+		
+		// set minimap to dirty
+		this.mini_map.isDirty = true;
 	};
 	
 	MinerGame.Component.World.prototype.hitTile = function(x, y, hit_strength) {
@@ -214,6 +229,13 @@
 	
 	MinerGame.Component.World.prototype.getMapTile = function(x, y) {
 		return this.map.getTile(x, y, this.layer);
+	};
+	
+	MinerGame.Component.World.prototype.getMapTileXY = function(worldX, worldY) {
+		return new Phaser.Point(
+			this.layer.getTileX(worldX),
+			this.layer.getTileY(worldY)
+		);
 	};
 	
 	MinerGame.Component.World.prototype.getTiles = function(x, y, width, height) {
@@ -338,6 +360,11 @@
 	
 	// left mouse click
 	MinerGame.Component.World.prototype.handleLeftClick = function() {
+		if(this.game.physics.arcade.isPaused) {
+			// game is paused
+			return;
+		}
+		
 		if(!this.game.input.activePointer.withinGame) {
 			// mouse outside of game canvas
 			return;
@@ -351,6 +378,11 @@
 	
 	// right mouse click
 	MinerGame.Component.World.prototype.handleRightClick = function() {
+		if(this.game.physics.arcade.isPaused) {
+			// game is paused
+			return;
+		}
+		
 		if(!this.game.input.activePointer.withinGame) {
 			// mouse outside of game canvas
 			return;
@@ -361,12 +393,16 @@
 		console.log("num item cracks: ", this.tile_cracks.children.length);
 	};
 	
-	
-	
 	// mouse wheel
 	MinerGame.Component.World.prototype.handleMouseWheel = function(context) {
 		return function() {
+			if(context.game.physics.arcade.isPaused) {
+				// game is paused
+				return;
+			}
+			
 			// player capture scroll
 			context.player.captureMouseWheel();
 		};
 	};
+	

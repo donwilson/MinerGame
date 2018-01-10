@@ -5,6 +5,8 @@
 	MinerGame.Component.WorldGenerator = function(game, width, height, max_sky) {
 		this.game = game;
 		
+		this.debug = false;   // set to true to show log messages
+		
 		this.tiles = [];
 		this.width = width || 100;
 		this.height = height || 250;
@@ -63,7 +65,11 @@
 	};
 	
 	MinerGame.Component.WorldGenerator.prototype.renderStatusText = function(txt) {
-		console.log("renderStatusText: ", txt);
+		if(!!this.debug) {
+			return;
+		}
+		
+		console.log("renderStatusText:", txt);
 	}
 	
 	MinerGame.Component.WorldGenerator.prototype.getTiles = function() {
@@ -390,7 +396,7 @@
 				// stump tile changed, update tile
 				this.place_tile(tree.stump.x, tree.stump.y, new_stump_tile_type);
 				
-				console.log("adjusted stump #"+ tree.uuid);
+				this.renderStatusText("adjusted stump #"+ tree.uuid);
 			}
 		}, this);
 		

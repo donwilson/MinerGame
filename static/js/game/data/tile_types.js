@@ -8,6 +8,7 @@
 		'air': {
 			'type': "tile",
 			'sprites': [40],
+			'color': false,
 			'collide': false,
 			'properties': {
 				'title': "Air",
@@ -19,6 +20,7 @@
 		'bedrock': {
 			'type': "tile",
 			'sprites': [360, 361, 362, 363],
+			'color': 0x161616,
 			'collide': true,
 			'properties': {
 				'title': "Bedrock",
@@ -28,6 +30,7 @@
 		'dirt': {
 			'type': "tile",
 			'sprites': [200, 201, 203, 204, 205, 206, 207],
+			'color': 0x2D1E0F,
 			'collide': true,
 			'properties': {
 				'title': "Dirt",
@@ -37,6 +40,7 @@
 		'stone': {
 			'type': "tile",
 			'sprites': [80, 81, 82, 83, 84, 85, 86, 87],
+			'color': 0x6D6D6D,
 			'collide': true,
 			'properties': {
 				'title': "Stone",
@@ -46,6 +50,7 @@
 		'ore': {
 			'type': "tile",
 			'sprites': [2640, 2641, 2642, 2643],
+			'color': 0x588259,
 			'collide': true,
 			'properties': {
 				'title': "Ore",
@@ -55,6 +60,7 @@
 		'lava': {
 			'type': "tile",
 			'sprites': [1120, 1121, 1122, 1123],
+			'color': 0xFF4000,
 			'collide': true,
 			'properties': {
 				'title': "Lava",
@@ -66,6 +72,7 @@
 		'tree_leaf': {
 			'type': "tile",
 			'sprites': [1395],
+			'color': 0x22A851,
 			'collide': false,
 			'properties': {
 				'title': "Tree Leaf",
@@ -78,6 +85,7 @@
 		'tree_trunk': {
 			'type': "tile",
 			'sprites': [1386, 1387, 1388],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Trunk",
@@ -90,6 +98,7 @@
 		'tree_stump': {
 			'type': "tile",
 			'sprites': [1391],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump",
@@ -102,6 +111,7 @@
 		'tree_stump_both': {
 			'type': "tile",
 			'sprites': [1392],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump Both",
@@ -114,6 +124,7 @@
 		'tree_stump_left': {
 			'type': "tile",
 			'sprites': [1389],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump Left",
@@ -126,6 +137,7 @@
 		'tree_stump_right': {
 			'type': "tile",
 			'sprites': [1390],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump Right",
@@ -138,6 +150,7 @@
 		'tree_stump_arm_left': {
 			'type': "tile",
 			'sprites': [1393],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump Arm Left",
@@ -150,6 +163,7 @@
 		'tree_stump_arm_right': {
 			'type': "tile",
 			'sprites': [1394],
+			'color': 0x976B4B,
 			'collide': false,
 			'properties': {
 				'title': "Tree Stump Arm Right",
@@ -166,6 +180,7 @@
 			'type': "tile",
 			'sprites': [1397],
 			'inventory_sprite': 1396,
+			'color': 0x815F36,
 			'collide': true,
 			'properties': {
 				'title': "Wood",

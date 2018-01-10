@@ -11,6 +11,7 @@
 		this.sprite = MinerGame.Data.missing_tile_sprite;
 		this.inventory_sprite = MinerGame.Data.missing_tile_sprite;
 		this.properties = {};
+		this.color = false;
 		this.collides = false;
 		this.strength = 1;
 		
@@ -47,6 +48,10 @@
 		this.collides = tile_data.collide || false;
 		this.strength = tile_data.properties.strength;
 		this.health = this.strength;
+		
+		if(!_.isUndefined(tile_data.color) && (false !== tile_data.color)) {
+			this.color = tile_data.color;
+		}
 	};
 	
 	MinerGame.Component.WorldTile.prototype.getTileSprite = function() {
@@ -157,6 +162,10 @@
 		
 		// reset timer key
 		this.timer_key = null;
+	};
+	
+	MinerGame.Component.WorldTile.prototype.getMiniMapColor = function() {
+		return this.color;
 	};
 	
 	MinerGame.Component.WorldTile.prototype.destroy = function() {

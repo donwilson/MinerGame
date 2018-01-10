@@ -61,6 +61,11 @@
 	MinerGame.Entity.Player.prototype.constructor = MinerGame.Entity.Player;
 	
 	MinerGame.Entity.Player.prototype.update = function() {
+		if(this.game.physics.arcade.isPaused) {
+			// game is paused
+			return;
+		}
+		
 		var is_fast = false;//var is_fast = this.wasd.shift.isDown;
 		
 		var player_jump_amount = (TILE_HEIGHT * 9);
@@ -187,9 +192,9 @@
 		
 		if("tool" === item.type) {
 			if(this.facing_right) {
-				this.tool.scale.x = 1;
-			} else {
 				this.tool.scale.x = -1;
+			} else {
+				this.tool.scale.x = 1;
 			}
 			
 			this.tool.scale.y = 1;
@@ -217,9 +222,9 @@
 		var angle_calc = 0;
 		
 		angle_calc -= MinerGame.Data.tile_types[ this.tool.name ].angle_offset;
-		angle_calc += desired_angle;
+		angle_calc -= desired_angle;
 		
-		if(!this.facing_right) {
+		if(this.facing_right) {
 			angle_calc *= -1;
 		}
 		
