@@ -74,6 +74,7 @@
 		this.player = new MinerGame.Entity.Player(this.game, this, this.desired_character);
 		
 		// make camera follow player
+		//this.game.renderer.renderSession.roundPixels = true;
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW_PLATFORMER);
 		
 		// enable gravity
@@ -99,8 +100,6 @@
 		
 		// overlap(object1, object2 [, overlapCallback] [, processCallback] [, callbackContext])
 		this.game.physics.arcade.overlap(this.player, this.tile_drops, this.player.handleItemDropPickup, null, this.player);
-		
-		this.mini_map.requestDraw();
 	};
 	
 	MinerGame.Component.World.prototype.render = function() {

@@ -267,6 +267,13 @@
 		return this.character.properties.reach;
 	};
 	
+	MinerGame.Entity.Player.prototype.getTilePositionXY = function() {
+		return new Phaser.Point(
+			this.custWorld.layer.getTileX(this.centerX),
+			this.custWorld.layer.getTileY(this.centerY)
+		);
+	};
+	
 	MinerGame.Entity.Player.prototype.getDistance = function(x, y) {
 		//return this.game.math.distance(this.custWorld.layer.getTileX(this.x), this.custWorld.layer.getTileY(this.y), tileX, tileY);
 		return this.game.math.distance(this.centerX, this.centerY, x, y);

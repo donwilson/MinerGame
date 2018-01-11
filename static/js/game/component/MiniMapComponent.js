@@ -6,8 +6,9 @@
 		this.game = game;
 		this.custWorld = custWorld;
 		
-		this.debug = true;   // set to true to enable console log
-		
+		this.last_render_position = new Phaser.Point(0, 0);
+		this.last_render = 0;
+		this.render_every_ms = 1000;
 		this.isDirty = true;   // set to true to redraw minimap
 		
 		this.properties = {
@@ -24,32 +25,34 @@
 		
 		// add generated minimap to game
 		this.game.add.existing(this);
-		
-		this.requestDraw(true);
 	};
 	
 	MinerGame.Component.MiniMap.prototype = Object.create(Phaser.Graphics.prototype);
 	MinerGame.Component.MiniMap.prototype.constructor = MinerGame.Component.MiniMap;
 	
-	MinerGame.Component.MiniMap.prototype.log = function(txt) {
-		if(this.debug) {
-			console.log("MiniMap:", txt);
-		}
-	};
-	
-	MinerGame.Component.MiniMap.prototype.requestDraw = function(force) {
-		force = !!force;
+	MinerGame.Component.MiniMap.prototype.update = function() {
+		var playerPosition = null;
 		
-		if(!force && !this.isDirty) {
+		if(!this.isDirty && ((this.game.time.now - this.last_render) >= this.render_every_ms)) {
+			this.isDirty = true;
+		}
+		
+		if(!this.isDirty) {
+			playerPosition = this.custWorld.player.getTilePositionXY();
+			
+			if(!Phaser.Point.equals(this.last_render_position, playerPosition)) {
+				this.isDirty = true;
+			}
+		}
+		
+		if(!this.isDirty) {
 			return;
 		}
 		
-		this.log("Rendering minimap");
-		
 		var scale = 0.1;
 		
-		var width = (this.game.camera.view.width * scale);//var width = Math.floor((this.game.camera.width * scale));
-		var height = (this.game.camera.view.height * scale);//var height = Math.floor((this.game.camera.height * scale));
+		var width = (this.game.camera.view.width * scale);
+		var height = (this.game.camera.view.height * scale);
 		
 		var dot_width = (TILE_WIDTH * scale);
 		var dot_height = (TILE_HEIGHT * scale);
@@ -73,17 +76,6 @@
 		
 		var y, x, tile, tile_color;
 		
-		//this.log("camera = x: "+ this.game.camera.x +"-"+ (this.game.camera.x + this.game.camera.width) +", y: "+ this.game.camera.y +"-"+ (this.game.camera.y + this.game.camera.height))
-		this.log("camera.view = x: "+ this.game.camera.view.x +"-"+ (this.game.camera.view.x + this.game.camera.view.width) +", y: "+ this.game.camera.view.y +"-"+ (this.game.camera.view.y + this.game.camera.view.height))
-		//this.log("camera.position = x: "+ this.game.camera.position.x +"-"+ (this.game.camera.position.x + this.game.camera.width) +", y: "+ this.game.camera.position.y +"-"+ (this.game.camera.position.y + this.game.camera.height))
-		this.log("minimap scale = "+ scale);
-		this.log("minimap size = "+ width +"x"+ height);
-		this.log("dot size = "+ dot_width +"x"+ dot_height);
-		this.log("num_dots = "+ num_dots_x +","+ num_dots_y);
-		this.log("camera = "+ this.game.camera.view.x +","+ this.game.camera.view.y);
-		this.log("camera_tile_point = "+ camera_tile_point.x +","+ camera_tile_point.y);
-		
-		
 		// draw colored tiles
 		for(y = 0; y < num_dots_y; y++) {
 			for(x = 0; x < num_dots_x; x++) {
@@ -93,7 +85,6 @@
 				);
 				
 				if(false === tile) {
-					this.log("tile not found at "+ x +","+ y);
 					continue;
 				}
 				
@@ -115,9 +106,26 @@
 		}
 		
 		// draw player dot
-		//var player
+		if(null === playerPosition) {
+			playerPosition = this.custWorld.player.getTilePositionXY();
+		}
 		
+		var playerMiniMapPositionX = this.game.math.clamp((playerPosition.x - camera_tile_point.x), 0, (num_dots_x - 1));
+		var playerMiniMapPositionY = this.game.math.clamp((playerPosition.y - camera_tile_point.y), 0, (num_dots_y - 1));
+		
+		var playerDotColor = 0xFF00FF;
+		
+		this.beginFill(playerDotColor);
+		this.drawRect(
+			((playerMiniMapPositionX * dot_width) + this.properties.padding),
+			((playerMiniMapPositionY * dot_height) + this.properties.padding),
+			dot_width,
+			dot_height
+		);
+		this.endFill();
 		
 		this.isDirty = false;
+		this.last_render_position.set(playerPosition.x, playerPosition.y);
+		this.last_render = this.game.time.now;
 	};
 	
