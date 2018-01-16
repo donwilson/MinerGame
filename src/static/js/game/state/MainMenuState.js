@@ -43,7 +43,7 @@
 		this.logo.y = 100;
 		
 		// character
-		var spacing_between_logo_and_character = 100;
+		let spacing_between_logo_and_character = 100;
 		this.selectCharacter();
 		
 		this.character = this.game.add.sprite(
@@ -57,7 +57,7 @@
 		this.renderCharacter();
 		
 		// buttons
-		var spacing_between_arrow_and_character = 32;
+		let spacing_between_arrow_and_character = 32;
 		
 		this.arrow_left = this.game.add.button(
 			(this.character.x - (this.character.width / 2) - spacing_between_arrow_and_character - (TILE_WIDTH / 2)),
@@ -80,7 +80,7 @@
 		this.arrow_right.frame = MinerGame.Data.buttons.arrow_right.frame;
 		
 		// character text
-		var spacing_between_text_and_character = 12;
+		let spacing_between_text_and_character = 12;
 		this.character_text = this.game.add.text(
 			0, 
 			(this.character.bottom + spacing_between_text_and_character),
@@ -99,10 +99,10 @@
 		
 		
 		// button
-		var spacing_between_button_and_text = 18;
-		var button_text_size = 20;
-		var button_padding_x = 12;
-		var button_padding_y = 8;
+		let spacing_between_button_and_text = 18;
+		let button_text_size = 20;
+		let button_padding_x = 12;
+		let button_padding_y = 8;
 		
 		this.button_start_text = this.game.add.text(0, 0, "Start Game", {
 			'font': "bold "+ button_text_size +"px Arial",
@@ -137,7 +137,7 @@
 	//};
 	
 	MinerGame.State.MainMenu.prototype.changeCharacterLeft = function() {
-		var index_key = _.find(_.keys(this.available_characters), function(key) {
+		let index_key = _.find(_.keys(this.available_characters), function(key) {
 			return (this.available_characters[ key ] === this.selected_character);
 		}, this);
 		
@@ -153,7 +153,7 @@
 	};
 	
 	MinerGame.State.MainMenu.prototype.changeCharacterRight = function() {
-		var index_key = _.find(_.keys(this.available_characters), function(key) {
+		let index_key = _.find(_.keys(this.available_characters), function(key) {
 			return (this.available_characters[ key ] === this.selected_character);
 		}, this);
 		

@@ -67,9 +67,8 @@
 		this.draw();
 		
 		// setup backpack item sprites
-		var i, rect;
-		for(i = 0; i < this.num_bottom_slots; i++) {
-			rect = this.getItemBoxRelativeRect(i);
+		for(let i = 0; i < this.num_bottom_slots; i++) {
+			let rect = this.getItemBoxRelativeRect(i);
 			
 			this.box_slots[ i ] = {
 				'sprite': this.game.add.sprite(0, 0, 'world', MinerGame.Data.tile_types.air.sprites[0]),
@@ -134,10 +133,9 @@
 		this.box_graphic.endFill();
 		
 		// item boxes
-		var i, rect;
-		for(i = 0; i < this.num_bottom_slots; i++) {
+		for(let i = 0; i < this.num_bottom_slots; i++) {
 			// draw item box
-			rect = this.getItemBoxRelativeRect(i);
+			let rect = this.getItemBoxRelativeRect(i);
 			
 			if(i == this.selected_slot) {
 				// selected slot
@@ -171,11 +169,11 @@
 			return;
 		}
 		
-		var tile_data = MinerGame.Data.tile_types[ item_name ];
+		let tile_data = MinerGame.Data.tile_types[ item_name ];
 		add_quantity = add_quantity || 1;
 		
-		var invIndex = null;
-		var backupIndex = null;
+		let invIndex = null;
+		let backupIndex = null;
 		
 		_.each(this.inventory, function(value, index) {
 			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
@@ -224,7 +222,7 @@
 			return false;
 		}
 		
-		var item = MinerGame.Data.tile_types[ item_name ];
+		let item = MinerGame.Data.tile_types[ item_name ];
 		
 		if(!item.type || ("tool" !== item.type)) {
 			return false;
@@ -232,7 +230,7 @@
 		
 		add_quantity = add_quantity || 1;
 		
-		var invIndex = null;
+		let invIndex = null;
 		
 		_.each(this.inventory, function(value, index) {
 			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
@@ -301,8 +299,8 @@
 		//console.log("useSelectedItemSlot: "+ tileX +", "+ tileY);
 		
 		// make sure activePointer is still at tileX, tileY
-		var activePointerTileX = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
-		var activePointerTileY = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
+		let activePointerTileX = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
+		let activePointerTileY = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
 		
 		if((activePointerTileX != tileX) || (activePointerTileY != tileY)) {
 			return;
@@ -312,15 +310,15 @@
 			return;
 		}
 		
-		var selected_inventory_item = this.inventory[ this.selected_slot ];
+		let selected_inventory_item = this.inventory[ this.selected_slot ];
 		
 		if(!selected_inventory_item.quantity || ("air" === selected_inventory_item.item_name)) {
 			// nothing to do
 			return false;
 		}
 		
-		var tile_hit = this.custWorld.getTile(tileX, tileY);
-		var item_holding = MinerGame.Data.tile_types[ selected_inventory_item.item_name ];
+		let tile_hit = this.custWorld.getTile(tileX, tileY);
+		let item_holding = MinerGame.Data.tile_types[ selected_inventory_item.item_name ];
 		
 		if("tool" === item_holding.type) {
 			// use tool
@@ -345,7 +343,7 @@
 					if(!_.isUndefined(tile_hit.properties.drops)) {
 						// this tile breaks up into different 'drops', iterate over and add each
 						_.each(tile_hit.properties.drops, function(drop) {
-							var drop_quantity = drop.quantity || 1;
+							let drop_quantity = drop.quantity || 1;
 							
 							this.custWorld.emitItemDrop(drop.type, drop_quantity, tileX, tileY);
 							//this.addItem(drop.type, drop_quantity);
@@ -384,10 +382,8 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.updateItemBoxes = function() {
-		var i, quantity;
-		
-		for(i = 0; i < this.num_bottom_slots; i++) {
-			quantity = 0;
+		for(let i = 0; i < this.num_bottom_slots; i++) {
+			let quantity = 0;
 			
 			if(this.inventory[ i ] && this.inventory[ i ].quantity) {
 				quantity = this.inventory[ i ].quantity;
@@ -417,8 +413,8 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.setBackpackRect = function() {
-		var width = (this.box_padding + ((this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding) * this.num_bottom_slots) + (this.box_slot_spacing * Math.max(0, (this.num_bottom_slots - 1))) + this.box_padding);
-		var height = (this.box_padding + this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding + this.box_padding);
+		let width = (this.box_padding + ((this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding) * this.num_bottom_slots) + (this.box_slot_spacing * Math.max(0, (this.num_bottom_slots - 1))) + this.box_padding);
+		let height = (this.box_padding + this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding + this.box_padding);
 		
 		this.backpack_rect = new Phaser.Rectangle(
 			((this.game.camera.view.width / 2) - (width / 2)),
@@ -462,8 +458,8 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.captureClick = function() {
-		var cameraX = (this.game.input.activePointer.worldX - this.game.camera.view.x);
-		var cameraY = (this.game.input.activePointer.worldY - this.game.camera.view.y);
+		let cameraX = (this.game.input.activePointer.worldX - this.game.camera.view.x);
+		let cameraY = (this.game.input.activePointer.worldY - this.game.camera.view.y);
 		
 		// check if click is inside backpack, if so do logic and capture (return true), otherwise release click (return false)
 		if(!this.backpack_rect.contains(cameraX, cameraY)) {
@@ -473,9 +469,9 @@
 		}
 		
 		// determine which box slot is clicked
-		var relativeX = (cameraX - this.backpack_rect.topLeft.x);
-		var relativeY = (cameraY - this.backpack_rect.topLeft.y);
-		var invIndex = null;
+		let relativeX = (cameraX - this.backpack_rect.topLeft.x);
+		let relativeY = (cameraY - this.backpack_rect.topLeft.y);
+		let invIndex = null;
 		
 		_.each(this.box_slots, function(box_slot, index) {
 			// @TODO max quantity per slot (based on MinerGame.Data.tile_types.max_inventory_slot_quantity?)
@@ -492,7 +488,7 @@
 	};
 	
 	MinerGame.Component.Backpack.prototype.handleMouseWheel = function() {
-		var new_selected_slot = this.selected_slot;
+		let new_selected_slot = this.selected_slot;
 		
 		if(this.game.input.mouse.wheelDelta == -1) {
 			// wheel scrolled down, scroll right in inventory

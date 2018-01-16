@@ -41,7 +41,7 @@
 		this.body.collideWorldBounds = true;
 		
 		// tool
-		var active_backpack_item = this.backpack.getActiveItem();
+		let active_backpack_item = this.backpack.getActiveItem();
 		
 		this.tool = this.addChild(game.make.sprite(0, 0, 'world', MinerGame.Data.tile_types.air.sprites[0]));
 		this.positionTool();
@@ -66,20 +66,20 @@
 			return;
 		}
 		
-		var is_fast = false;//var is_fast = this.wasd.shift.isDown;
+		let is_fast = false;//let is_fast = this.wasd.shift.isDown;
 		
-		var player_jump_amount = (TILE_HEIGHT * 9);
-		var player_speed = (TILE_WIDTH * 4);
+		let player_jump_amount = (TILE_HEIGHT * 9);
+		let player_speed = (TILE_WIDTH * 4);
 		
 		if(is_fast) {
 			player_speed = (TILE_WIDTH * 18);
 		}
 		
-		var pressing_jump = this.cursors.up.isDown || this.wasd.jump.isDown || false;
-		var do_jump = false;   // set after we know if player can jump
+		let pressing_jump = this.cursors.up.isDown || this.wasd.jump.isDown || false;
+		let do_jump = false;   // set after we know if player can jump
 		this.is_standing = this.body.onFloor();
-		var running_left = this.cursors.left.isDown || this.wasd.left.isDown || false;
-		var running_right = this.cursors.right.isDown || this.wasd.right.isDown || false;
+		let running_left = this.cursors.left.isDown || this.wasd.left.isDown || false;
+		let running_right = this.cursors.right.isDown || this.wasd.right.isDown || false;
 		
 		if(this.can_jump && pressing_jump && this.is_standing) {
 			// jump
@@ -164,7 +164,7 @@
 	};
 	
 	MinerGame.Entity.Player.prototype.positionTool = function() {
-		var backpack_active_item = this.backpack.getActiveItem();
+		let backpack_active_item = this.backpack.getActiveItem();
 		
 		if((null === backpack_active_item) || !backpack_active_item.type || !backpack_active_item.item_name || !backpack_active_item.quantity) {
 			this.tool.alpha = 0;
@@ -172,8 +172,8 @@
 			return;
 		}
 		
-		var item_name = backpack_active_item.item_name;
-		var item = MinerGame.Data.tile_types[ item_name ];
+		let item_name = backpack_active_item.item_name;
+		let item = MinerGame.Data.tile_types[ item_name ];
 		
 		if(("tile" === item.type) && ("air" === item_name)) {
 			// hide air
@@ -219,7 +219,7 @@
 	};
 	
 	MinerGame.Entity.Player.prototype.calculateToolAngle = function(desired_angle) {
-		var angle_calc = 0;
+		let angle_calc = 0;
 		
 		angle_calc -= MinerGame.Data.tile_types[ this.tool.name ].angle_offset;
 		angle_calc -= desired_angle;
@@ -233,7 +233,7 @@
 	};
 	
 	MinerGame.Entity.Player.prototype.pickCharacter = function(selected_character) {
-		var picked_character;
+		let picked_character;
 		
 		if(("undefined" !== typeof selected_character) && (null !== selected_character) && MinerGame.Data.playable_characters[ selected_character ]) {
 			picked_character = selected_character;
@@ -295,11 +295,11 @@
 			return;
 		}
 		
-		var worldX = this.game.input.activePointer.worldX;
-		var worldY = this.game.input.activePointer.worldY;
+		let worldX = this.game.input.activePointer.worldX;
+		let worldY = this.game.input.activePointer.worldY;
 		
 		// determine if mouse is too near or too far away from player
-		var distance_from_player = this.getDistance(worldX, worldY);
+		let distance_from_player = this.getDistance(worldX, worldY);
 		
 		if(distance_from_player > (this.getReach() * TILE_WIDTH)) {
 			// too far away
@@ -308,15 +308,15 @@
 		
 		
 		// attempt to use active item in backpack
-		var backpack_active_item = this.backpack.getActiveItem();
+		let backpack_active_item = this.backpack.getActiveItem();
 		
 		if(null === backpack_active_item) {
 			return;
 		}
 		
 		// which tile you're hitting
-		var tileX = this.custWorld.layer.getTileX(worldX);
-		var tileY = this.custWorld.layer.getTileY(worldY);
+		let tileX = this.custWorld.layer.getTileX(worldX);
+		let tileY = this.custWorld.layer.getTileY(worldY);
 		
 		if(backpack_active_item.type && ("tool" === backpack_active_item.type)) {
 			// cant use tool while jumping (for now)
@@ -324,7 +324,7 @@
 				return;
 			}
 			
-			var tile_hit = this.custWorld.getTile(tileX, tileY);
+			let tile_hit = this.custWorld.getTile(tileX, tileY);
 			
 			if("air" === tile_hit.type) {
 				return;
@@ -335,8 +335,8 @@
 			// future...
 			
 		} else {
-			var playerTileX = this.custWorld.layer.getTileX(this.centerX);
-			var playerTileY = this.custWorld.layer.getTileY(this.centerY);
+			let playerTileX = this.custWorld.layer.getTileX(this.centerX);
+			let playerTileY = this.custWorld.layer.getTileY(this.centerY);
 			
 			if((tileX == playerTileX) && (tileY == playerTileY)) {
 				// too close for placing tiles
@@ -374,10 +374,10 @@
 			this.tweens.tool = null;
 		}
 		
-		var backpack_active_item = this.backpack.getActiveItem();
+		let backpack_active_item = this.backpack.getActiveItem();
 		
-		var angle_start = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_resting);
-		var angle_end = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_max);
+		let angle_start = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_resting);
+		let angle_end = this.calculateToolAngle(MinerGame.Data.tile_types[ backpack_active_item.item_name ].angle_max);
 		
 		this.tool.angle = angle_start;
 		

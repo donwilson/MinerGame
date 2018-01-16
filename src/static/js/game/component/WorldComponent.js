@@ -36,7 +36,7 @@
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 		
 		// create world
-		var world_generator = new MinerGame.Component.WorldGenerator(this.game, this.width, this.height, this.height_sky);
+		let world_generator = new MinerGame.Component.WorldGenerator(this.game, this.width, this.height, this.height_sky);
 		world_generator.create();
 		
 		// apply generated world
@@ -113,12 +113,10 @@
 	};
 	
 	MinerGame.Component.World.prototype.applyRawTiles = function(raw_tiles) {
-		var x, y;
-		
-		for(y = 0; y < raw_tiles.length; y++) {
+		for(let y = 0; y < raw_tiles.length; y++) {
 			this.tiles[ y ] = [];
 			
-			for(x = 0; x < raw_tiles[ y ].length; x++) {
+			for(let x = 0; x < raw_tiles[ y ].length; x++) {
 				this.tiles[ y ][ x ] = new MinerGame.Component.WorldTile(this.game, this, x, y, raw_tiles[ y ][ x ]);
 			}
 		}
@@ -132,8 +130,8 @@
 	
 	MinerGame.Component.World.prototype.replaceTile = function(x, y, new_tile_type) {
 		// replace tile
-		var new_world_tile = new MinerGame.Component.WorldTile(this.game, this, x, y, new_tile_type);
-		var newTile = new Phaser.Tile(this.layer, new_world_tile.getTileSprite(), x, y, TILE_WIDTH, TILE_HEIGHT);
+		let new_world_tile = new MinerGame.Component.WorldTile(this.game, this, x, y, new_tile_type);
+		let newTile = new Phaser.Tile(this.layer, new_world_tile.getTileSprite(), x, y, TILE_WIDTH, TILE_HEIGHT);
 		
 		// get existing tile and destroy
 		if(!_.isUndefined(this.tiles[ y ]) && !_.isUndefined(this.tiles[ y ][ x ])) {
@@ -162,13 +160,13 @@
 		// returns true if tile broken, false if not
 		hit_strength = hit_strength || 1;
 		
-		var world_tile = this.getTile(x, y);
+		let world_tile = this.getTile(x, y);
 		
 		if(false === world_tile) {
 			return false;
 		}
 		
-		var tile_broken = world_tile.takeHit(hit_strength);
+		let tile_broken = world_tile.takeHit(hit_strength);
 		
 		if(!tile_broken) {
 			return false;
@@ -192,7 +190,7 @@
 	
 	MinerGame.Component.World.prototype.getTileSpritesNotCollideableWithPlayer = function() {
 		// build index of tile sprites that don't collide with player
-		var sprites = [];
+		let sprites = [];
 		
 		_.each(MinerGame.Data.tile_types, function(value, key) {
 			if(!value.collide && value.sprites.length) {
@@ -205,7 +203,7 @@
 	
 	MinerGame.Component.World.prototype.getTileSpritesCollideableWithPlayer = function() {
 		// build index of tile sprites that collide with player
-		var sprites = [];
+		let sprites = [];
 		
 		_.each(MinerGame.Data.tile_types, function(value, key) {
 			if(value.collide && value.sprites.length) {
@@ -243,15 +241,14 @@
 			return [];
 		}
 		
-		var xy_tiles = [];
-		var tx, ty;
-		var tx_to = Math.min((x + width), this.width);
-		var ty_to = Math.min((y + height), this.height);
+		let xy_tiles = [];
+		let tx_to = Math.min((x + width), this.width);
+		let ty_to = Math.min((y + height), this.height);
 		
-		for(ty = y; ty <= ty_to; ty++) {
-			var x_tiles = [];
+		for(let ty = y; ty <= ty_to; ty++) {
+			let x_tiles = [];
 			
-			for(tx = x; tx <= tx_to; tx++) {
+			for(let tx = x; tx <= tx_to; tx++) {
 				x_tiles.push( this.tiles[ ty ][ tx ] );
 			}
 			
@@ -263,13 +260,12 @@
 	
 	MinerGame.Component.World.prototype.toCSV = function() {
 		// generate CSV of map
-		var y_data = [],
-			x_data;
+		let y_data = [];
 		
-		for(var y = 0; y < this.height; y++) {
-			x_data = [];
+		for(let y = 0; y < this.height; y++) {
+			let x_data = [];
 			
-			for(var x = 0; x < this.width; x++) {
+			for(let x = 0; x < this.width; x++) {
 				x_data.push(this.tiles[ y ][ x ].getTileSprite());
 			}
 			
@@ -281,18 +277,17 @@
 	
 	MinerGame.Component.World.prototype.toJSON = function() {
 		// generate Tiled JSON of map
-		var raw_layer_tiles = [];
-		var tile_properties = {};
+		let raw_layer_tiles = [];
+		let tile_properties = {};
 		
 		// convert tile multi array to single array
-		var x, y, tmp, tile, sprite_number;
-		for(y = 0; y < this.height; y++) {
-			tmp = [];
+		for(let y = 0; y < this.height; y++) {
+			let tmp = [];
 			
-			for(x = 0; x < this.width; x++) {
-				tile = this.tiles[ y ][ x ];
+			for(let x = 0; x < this.width; x++) {
+				let tile = this.tiles[ y ][ x ];
 				
-				sprite_number = tile.getTileSprite();
+				let sprite_number = tile.getTileSprite();
 				tmp.push(sprite_number +"("+ tile.properties.type +")");
 				
 				raw_layer_tiles.push(sprite_number);
@@ -351,8 +346,8 @@
 	
 	// mouse move
 	MinerGame.Component.World.prototype.handleMouseMove = function() {
-		//var tile_x = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
-		//var tile_y = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
+		//let tile_x = this.custWorld.layer.getTileX(this.game.input.activePointer.worldX);
+		//let tile_y = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
 		
 		
 	};

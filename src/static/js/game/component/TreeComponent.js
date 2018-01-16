@@ -41,9 +41,9 @@
 		];
 		
 		// trunk
-		var trunk_height = this.game.rnd.between(1, 6);
+		let trunk_height = this.game.rnd.between(1, 6);
 		
-		for(var i = 1; i <= trunk_height; i++) {
+		for(let i = 1; i <= trunk_height; i++) {
 			this.tree_parts.push(["air","air","tree_trunk","air","air"]);
 		}
 		
@@ -70,9 +70,9 @@
 			return [];
 		}
 		
-		var tiles = [];
-		var tile_type;
-		var topLeft = this.topLeft;
+		let tiles = [];
+		let tile_type;
+		let topLeft = this.topLeft;
 		
 		_.each(this.tree_parts, function(cols, offset_y) {
 			_.each(cols, function(tile_type, offset_x) {
@@ -91,7 +91,7 @@
 	};
 	
 	/*MinerGame.Component.Tree.prototype.alternate_tile_type = function(tile_type) {
-		var groups = [
+		let groups = [
 			["tree_trunk", "tree_trunk_alt", "tree_trunk_alt2"]
 		];
 		

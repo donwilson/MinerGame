@@ -27,8 +27,8 @@
 		this.game.stage.backgroundColor = "#10151d";
 		
 		// bar rectangle
-		var bar_width = (this.game.camera.view.width * 0.7);
-		var bar_height = 10;
+		let bar_width = (this.game.camera.view.width * 0.7);
+		let bar_height = 10;
 		
 		this.rect_progress = new Phaser.Rectangle(
 			(this.game.camera.view.centerX - (bar_width / 2)),
@@ -53,10 +53,10 @@
 		this.game.load.onLoadComplete.add(this.onLoadComplete, this);
 		
 		// load assets
-		this.game.load.image('background', "/static/images/background.jpg");
-		this.game.load.image('logo', "/static/images/logo.png");
-		this.game.load.spritesheet('world', "/static/images/world.png", TILE_WIDTH, TILE_HEIGHT);
-		this.game.load.spritesheet('buttons', "/static/images/buttons.png", 32, 32);
+		this.game.load.image('background', "static/images/background.jpg");
+		this.game.load.image('logo', "static/images/logo.png");
+		this.game.load.spritesheet('world', "static/images/world.png", TILE_WIDTH, TILE_HEIGHT);
+		this.game.load.spritesheet('buttons', "static/images/buttons.png", 32, 32);
 	};
 	
 	MinerGame.State.Preloader.prototype.create = function() {
@@ -65,7 +65,7 @@
 	
 	MinerGame.State.Preloader.prototype.setProgressBar = function(progress) {
 		progress = this.game.math.clamp(progress, 0, 100);
-		var progress_percent = (progress / 100);
+		let progress_percent = (progress / 100);
 		
 		this.graphic_progress.clear();
 		
@@ -85,8 +85,8 @@
 			(this.rect_progress.y - this.container_padding)
 		);
 		
-		var container_width = (this.container_padding + this.rect_progress.width + this.container_padding);
-		var container_height = (this.container_padding + this.rect_progress.height + this.container_padding);
+		let container_width = (this.container_padding + this.rect_progress.width + this.container_padding);
+		let container_height = (this.container_padding + this.rect_progress.height + this.container_padding);
 		
 		this.graphic_container.beginFill(this.container_background_color);
 		this.graphic_container.fillAlpha = this.container_background_alpha;

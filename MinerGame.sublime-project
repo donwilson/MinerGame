@@ -3,23 +3,33 @@
 	[
 		{
 			"name": "MinerGame",
-			"path": "static/js/game/",
+			"path": "src/static/js/game/",
 			"file_exclude_patterns": [
 				"*.*CST"
 			]
 		},
 		{
 			"name": "Images",
-			"path": "static/images/",
+			"path": "src/static/images/",
 			"file_exclude_patterns": [
 				"*.*CST"
 			]
 		},
 		{
 			"name": "Frontend",
+			"path": "src/",
+			"file_exclude_patterns": [
+				"*.*CST"
+			]
+		},
+		{
+			"name": "Project",
 			"path": ".",
 			"file_exclude_patterns": [
 				"*.*CST"
+			],
+			"folder_exclude_patterns": [
+				"src"
 			]
 		}
 	]

@@ -1,0 +1,8 @@
+{
+	"name": "MinerGame",
+	"version": "0.1.0",
+	"main": "src/electron.js",
+	"dependencies": {
+		"electron-reload": "^1.2.2"
+	}
+}

@@ -30,7 +30,7 @@
 	MinerGame.Component.WorldTile.prototype.constructor = MinerGame.Component.WorldTile;
 	
 	MinerGame.Component.WorldTile.prototype.create = function() {
-		var tile_data = MinerGame.Data.tile_types[ this.type ];
+		let tile_data = MinerGame.Data.tile_types[ this.type ];
 		
 		if(!_.isUndefined(tile_data.sprites) && tile_data.sprites.length) {
 			// pick sprite from this tile's sprite list
@@ -77,7 +77,7 @@
 			// tile not broken yet
 			// @TMP reduce alpha (for now) to (health/strength)
 			
-			var map_tile = this.custWorld.getMapTile(this.x, this.y);
+			let map_tile = this.custWorld.getMapTile(this.x, this.y);
 			
 			if(null === map_tile) {
 				// map tile not found
@@ -88,9 +88,9 @@
 			//// tell map layer to redraw tiles since this map tile changed
 			//this.custWorld.requestTileUpdate();
 			
-			var amount_cracked = (1 - (this.health / this.strength));
+			let amount_cracked = (1 - (this.health / this.strength));
 			
-			var crack_frame;
+			let crack_frame;
 			
 			if(amount_cracked >= 0.75) {
 				crack_frame = 1349;
@@ -139,7 +139,7 @@
 			return;
 		}
 		
-		var map_tile = this.custWorld.map.getTile(this.x, this.y);
+		let map_tile = this.custWorld.map.getTile(this.x, this.y);
 		
 		if(null === map_tile) {
 			return;

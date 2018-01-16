@@ -31,7 +31,7 @@
 	MinerGame.Component.MiniMap.prototype.constructor = MinerGame.Component.MiniMap;
 	
 	MinerGame.Component.MiniMap.prototype.update = function() {
-		var playerPosition = null;
+		let playerPosition = null;
 		
 		if(!this.isDirty && ((this.game.time.now - this.last_render) >= this.render_every_ms)) {
 			this.isDirty = true;
@@ -49,18 +49,18 @@
 			return;
 		}
 		
-		var scale = 0.1;
+		let scale = 0.1;
 		
-		var width = (this.game.camera.view.width * scale);
-		var height = (this.game.camera.view.height * scale);
+		let width = (this.game.camera.view.width * scale);
+		let height = (this.game.camera.view.height * scale);
 		
-		var dot_width = (TILE_WIDTH * scale);
-		var dot_height = (TILE_HEIGHT * scale);
+		let dot_width = (TILE_WIDTH * scale);
+		let dot_height = (TILE_HEIGHT * scale);
 		
-		var num_dots_x = Math.ceil( (width / dot_width) );
-		var num_dots_y = Math.ceil( (height / dot_height) );
+		let num_dots_x = Math.ceil( (width / dot_width) );
+		let num_dots_y = Math.ceil( (height / dot_height) );
 		
-		var camera_tile_point = this.custWorld.getMapTileXY(this.game.camera.x, this.game.camera.y);
+		let camera_tile_point = this.custWorld.getMapTileXY(this.game.camera.x, this.game.camera.y);
 		
 		// begin drawing
 		this.clear();
@@ -74,12 +74,10 @@
 		);
 		this.endFill();
 		
-		var y, x, tile, tile_color;
-		
 		// draw colored tiles
-		for(y = 0; y < num_dots_y; y++) {
-			for(x = 0; x < num_dots_x; x++) {
-				tile = this.custWorld.getTile(
+		for(let y = 0; y < num_dots_y; y++) {
+			for(let x = 0; x < num_dots_x; x++) {
+				let tile = this.custWorld.getTile(
 					(camera_tile_point.x + x),
 					(camera_tile_point.y + y)
 				);
@@ -88,7 +86,7 @@
 					continue;
 				}
 				
-				tile_color = tile.getMiniMapColor();
+				let tile_color = tile.getMiniMapColor();
 				
 				if(false === tile_color) {
 					continue;
@@ -110,10 +108,10 @@
 			playerPosition = this.custWorld.player.getTilePositionXY();
 		}
 		
-		var playerMiniMapPositionX = this.game.math.clamp((playerPosition.x - camera_tile_point.x), 0, (num_dots_x - 1));
-		var playerMiniMapPositionY = this.game.math.clamp((playerPosition.y - camera_tile_point.y), 0, (num_dots_y - 1));
+		let playerMiniMapPositionX = this.game.math.clamp((playerPosition.x - camera_tile_point.x), 0, (num_dots_x - 1));
+		let playerMiniMapPositionY = this.game.math.clamp((playerPosition.y - camera_tile_point.y), 0, (num_dots_y - 1));
 		
-		var playerDotColor = 0xFF00FF;
+		let playerDotColor = 0xFF00FF;
 		
 		this.beginFill(playerDotColor);
 		this.drawRect(

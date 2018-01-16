@@ -10,13 +10,13 @@
 			'quantity': quantity || 1
 		};
 		
-		var tile_data = MinerGame.Data.tile_types[ tile_type ];
+		let tile_data = MinerGame.Data.tile_types[ tile_type ];
 		
-		var x = ((tileX * TILE_WIDTH) + (TILE_WIDTH / 2) + this.game.rnd.between(0, 4));
-		var y = ((tileY * TILE_HEIGHT) + (TILE_HEIGHT / 2));
+		let x = ((tileX * TILE_WIDTH) + (TILE_WIDTH / 2) + this.game.rnd.between(0, 4));
+		let y = ((tileY * TILE_HEIGHT) + (TILE_HEIGHT / 2));
 		
 		// determine sprite frame
-		var frame = MinerGame.Data.missing_tile_sprite;
+		let frame = MinerGame.Data.missing_tile_sprite;
 		
 		if(!_.isUndefined(tile_data.inventory_sprite)) {
 			frame = tile_data.inventory_sprite;

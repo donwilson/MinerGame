@@ -25,10 +25,8 @@
 	
 	MinerGame.Component.WorldGenerator.prototype.create = function() {
 		// create world
-		var x, y;
-		
 		// start instance tile array
-		for(y = 0; y < this.height; y++) {
+		for(let y = 0; y < this.height; y++) {
 			this.tiles[ y ] = [];
 		}
 		
@@ -80,27 +78,24 @@
 		this.renderStatusText("Calculating spawnable points");
 		
 		// skim map for sun-exposed spots and return array of Phaser.Point objects
-		var points = [];
-		var x, y;
-		var tile_name, tile, tile_below_name, tile_below;
-		
+		let points = [];
 		// scan left to right, top to bottom, find bottom most air from top
-		for(x = 0; x < this.width; x++) {
-			for(y = 0; y < this.height; y++) {
-				tile_name = this.get_tile(x, y);
-				tile = MinerGame.Data.tile_types[ tile_name ];
+		for(let x = 0; x < this.width; x++) {
+			for(let y = 0; y < this.height; y++) {
+				let tile_name = this.get_tile(x, y);
+				let tile = MinerGame.Data.tile_types[ tile_name ];
 				
 				if(tile.collide) {
 					continue;
 				}
 				
-				tile_below_name = this.get_tile(x, (y + 1));
+				let tile_below_name = this.get_tile(x, (y + 1));
 				
 				if(false === tile_below_name) {
 					continue;
 				}
 				
-				tile_below = MinerGame.Data.tile_types[ tile_below_name ];
+				let tile_below = MinerGame.Data.tile_types[ tile_below_name ];
 				
 				if(tile_below.collide) {
 					points.push(new Phaser.Point(x, y));
@@ -163,34 +158,29 @@
 	MinerGame.Component.WorldGenerator.prototype.generate_random_stone = function() {
 		this.renderStatusText("Generating stone...");
 		
-		var perlin = new PerlinNoise(),
-			px, px, pnoise,
-			pz,
-			pscale,
-			pnoise_round;
+		let perlin = new PerlinNoise();
 		
 		// SETTINGS
 		//pz = this.game.rnd.between(0.4, 0.6);
-		pz = (Math.random() * 10);//pz = 0;
-		pscale = (this.width / TILE_WIDTH);
+		let pz = (Math.random() * 10);//pz = 0;
+		let pscale = (this.width / TILE_WIDTH);
 		
 		// perlin map generator
-		var perlin_tile_type;
-		var cutoff = this.game.rnd.between(42, 46);
+		let cutoff = this.game.rnd.between(42, 46);
 		
 		// stone and ore
-		for(y = 0; y < this.height; y++) {
-			for(x = 0; x < this.width; x++) {
-				//px = (x / this.width);
-				//py = (y / this.height);
-				px = (x / TILE_WIDTH);
-				py = (y / TILE_HEIGHT);
+		for(let y = 0; y < this.height; y++) {
+			for(let x = 0; x < this.width; x++) {
+				//let px = (x / this.width);
+				//let py = (y / this.height);
+				let px = (x / TILE_WIDTH);
+				let py = (y / TILE_HEIGHT);
 				
-				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				let pnoise = perlin.noise((px * pscale), (py * pscale), pz);
 				
-				pnoise_round = Math.round( (pnoise * 100) );
+				let pnoise_round = Math.round( (pnoise * 100) );
 				
-				perlin_tile_type = "";
+				let perlin_tile_type = "";
 				
 				if(pnoise_round < cutoff) {
 					perlin_tile_type = "stone";
@@ -206,33 +196,26 @@
 	MinerGame.Component.WorldGenerator.prototype.generate_random_ore = function() {
 		this.renderStatusText("Generating ore...");
 		
-		var perlin = new PerlinNoise(),
-			num_x = this.width,
-			num_y = this.height,
-			x, y,
-			px, px, pnoise,
-			pz,
-			pscale,
-			pnoise_round;
+		let perlin = new PerlinNoise();
+		let num_x = this.width;
+		let num_y = this.height;
 		
 		// SETTINGS
-		pz = this.game.rnd.between(0.3, 0.5);
-		pscale = 1;//pscale = this.game.rnd.between(3, 10);
+		let pz = this.game.rnd.between(0.3, 0.5);
+		let pscale = 1;//let pscale = this.game.rnd.between(3, 10);
 		
 		// perlin map generator
-		var perlin_tile_type;
-		
 		// stone and ore
-		for(y = 0; y < this.height; y++) {
-			for(x = 0; x < this.width; x++) {
-				px = (x / this.width);
-				py = (y / this.height);
+		for(let y = 0; y < this.height; y++) {
+			for(let x = 0; x < this.width; x++) {
+				let px = (x / this.width);
+				let py = (y / this.height);
 				
-				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				let pnoise = perlin.noise((px * pscale), (py * pscale), pz);
 				
-				pnoise_round = Math.round( (pnoise * 100) );
+				let pnoise_round = Math.round( (pnoise * 100) );
 				
-				perlin_tile_type = "";
+				let perlin_tile_type = "";
 				
 				if(pnoise_round >= 80) {
 					perlin_tile_type = "ore";
@@ -248,31 +231,26 @@
 	MinerGame.Component.WorldGenerator.prototype.generate_random_caverns = function() {
 		this.renderStatusText("Generating caverns...");
 		
-		var perlin = new PerlinNoise(),
-			px, px, pnoise,
-			pz,
-			pscale,
-			pnoise_round;
+		let perlin = new PerlinNoise();
 		
 		// SETTINGS
-		pz = (Math.random() * 10);//pz = 0;
-		pscale = (this.width / TILE_WIDTH);
+		let pz = (Math.random() * 10);//pz = 0;
+		let pscale = (this.width / TILE_WIDTH);
 		
 		// perlin map generator
-		var perlin_tile_type;
-		var cutoff = this.game.rnd.between(28, 33);
+		let cutoff = this.game.rnd.between(28, 33);
 		
 		// stone and ore
-		for(y = 0; y < this.height; y++) {
-			for(x = 0; x < this.width; x++) {
-				px = (x / TILE_WIDTH);
-				py = (y / TILE_HEIGHT);
+		for(let y = 0; y < this.height; y++) {
+			for(let x = 0; x < this.width; x++) {
+				let px = (x / TILE_WIDTH);
+				let py = (y / TILE_HEIGHT);
 				
-				pnoise = perlin.noise((px * pscale), (py * pscale), pz);
+				let pnoise = perlin.noise((px * pscale), (py * pscale), pz);
 				
-				pnoise_round = Math.round( (pnoise * 100) );
+				let pnoise_round = Math.round( (pnoise * 100) );
 				
-				perlin_tile_type = "";
+				let perlin_tile_type = "";
 				
 				if(pnoise_round < cutoff) {
 					perlin_tile_type = "air";
@@ -290,12 +268,10 @@
 		
 		// add lava to world
 		// fill bottom to (bottom-lava_height) with lava
-		var lava_height = 5;
+		let lava_height = 5;
 		
-		var x, y;
-		
-		for(x = 0; x < this.width; x++) {
-			for(y = (this.height - lava_height); y < this.height; y++) {
+		for(let x = 0; x < this.width; x++) {
+			for(let y = (this.height - lava_height); y < this.height; y++) {
 				this.place_tile(x, y, 'lava');
 			}
 		}
@@ -305,33 +281,29 @@
 		this.renderStatusText("Generating trees...");
 		
 		// add trees to world
-		var num_trees_raw = Math.round( (this.width / this.game.rnd.between(5, 9)) );
+		let spawnable_points = this.getTopSpawnablePoints();
+		let num_trees_raw = Math.round( (this.width / this.game.rnd.between(5, 9)) );
 		
-		var spawnable_points = this.getTopSpawnablePoints();
-		
-		var num_trees = Math.min(spawnable_points.length, num_trees_raw);
+		let num_trees = Math.min(spawnable_points.length, num_trees_raw);
 		
 		if(!num_trees) {
 			return;
 		}
 		
 		// shuffle spawnable points
-		var tree_points = _.shuffle(spawnable_points);
-		var tree_point;
-		var tree;
-		var tree_tiles;
+		let tree_points = _.shuffle(spawnable_points);
 		
-		for(i = 0; i < num_trees; i++) {
+		for(let i = 0; i < num_trees; i++) {
 			// spawnable points are randomized, so iterating up is same as grabbing randomly
-			tree_point = tree_points[ i ];
+			let tree_point = tree_points[ i ];
 			
 			// check if tile below tree stump is plantable
 			if(_.isUndefined(this.tiles[ (tree_point.y + 1) ]) || _.isUndefined(this.tiles[ (tree_point.y + 1) ][ tree_point.x ]) || (-1 === _.indexOf(["dirt"], this.tiles[ (tree_point.y + 1) ][ tree_point.x ]))) {
 				continue;
 			}
 			
-			tree = new MinerGame.Component.Tree(this.game, tree_point.x, tree_point.y);
-			tree_tiles = tree.mapExportTiles();
+			let tree = new MinerGame.Component.Tree(this.game, tree_point.x, tree_point.y);
+			let tree_tiles = tree.mapExportTiles();
 			
 			if(_.isEmpty(tree_tiles)) {
 				continue;
@@ -376,10 +348,10 @@
 		
 		// @TODO: iterate over tree stumps, check left/right sides and replace with appropriate stump if different than what looks best
 		_.each(this.objects.trees, function(tree) {
-			var stump_tile_type = this.get_tile(tree.stump.x, tree.stump.y);
-			var tile_left_of_stump = this.get_tile((tree.stump.x - 1), tree.stump.y);
-			var tile_right_of_stump = this.get_tile((tree.stump.x + 1), tree.stump.y);
-			var new_stump_tile_type = stump_tile_type;
+			let stump_tile_type = this.get_tile(tree.stump.x, tree.stump.y);
+			let tile_left_of_stump = this.get_tile((tree.stump.x - 1), tree.stump.y);
+			let tile_right_of_stump = this.get_tile((tree.stump.x + 1), tree.stump.y);
+			let new_stump_tile_type = stump_tile_type;
 			
 			if(("tree_stump_arm_left" === tile_left_of_stump) && ("tree_stump_arm_right" === tile_right_of_stump)) {
 				new_stump_tile_type = "tree_stump_both";
@@ -407,10 +379,8 @@
 		this.renderStatusText("Generating sky...");
 		
 		// fill sky with air
-		var y, x;
-		
-		for(x = 0; x < this.width; x++) {
-			for(y = 0; y < this.height_sky; y++) {
+		for(let x = 0; x < this.width; x++) {
+			for(let y = 0; y < this.height_sky; y++) {
 				this.place_tile(x, y, 'air');
 			}
 		}
@@ -421,16 +391,14 @@
 		
 		// add lava to world
 		// fill bottom with bedrock
-		var bedrock_min_height = 1;
-		var bedrock_max_height = 3;
+		let bedrock_min_height = 1;
+		let bedrock_max_height = 3;
 		
-		var x, y;
-		
-		for(x = 0; x < this.width; x++) {
+		for(let x = 0; x < this.width; x++) {
 			// randomize height of bedrock a little by picking between max and min bedrock height
-			var column_height = this.game.rnd.between(bedrock_min_height, bedrock_max_height);
+			let column_height = this.game.rnd.between(bedrock_min_height, bedrock_max_height);
 			
-			for(y = (this.height - column_height); y < this.height; y++) {
+			for(let y = (this.height - column_height); y < this.height; y++) {
 				this.place_tile(x, y, 'bedrock');
 			}
 		}

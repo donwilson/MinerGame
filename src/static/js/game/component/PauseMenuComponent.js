@@ -50,7 +50,7 @@
 		}
 		
 		// background
-		var graphics = this.game.make.graphics(0, 0);
+		let graphics = this.game.make.graphics(0, 0);
 		this.elements.add(graphics);
 		
 		graphics.fixedToCamera = true;
@@ -61,8 +61,8 @@
 		graphics.endFill();
 		
 		// menu
-		/*var menu_width = 250;
-		var menu_padding = 10;
+		/*let menu_width = 250;
+		let menu_padding = 10;
 		
 		graphics.moveTo(
 			((this.game.camera.width / 2) - ((menu_padding + menu_width + menu_padding) / 2)),
@@ -70,11 +70,11 @@
 		);*/
 		
 		// button
-		var button_text_size = 20;
-		var button_padding_x = 12;
-		var button_padding_y = 8;
+		let button_text_size = 20;
+		let button_padding_x = 12;
+		let button_padding_y = 8;
 		
-		var button_resume_text = this.game.make.text(0, 0, "Resume Game", {
+		let button_resume_text = this.game.make.text(0, 0, "Resume Game", {
 			'font': "bold "+ button_text_size +"px Arial",
 			'fill': "#ffffff"
 		});
@@ -83,7 +83,7 @@
 		
 		button_resume_text.fixedToCamera = true;
 		
-		var button_resume_bg = this.game.make.graphics(
+		let button_resume_bg = this.game.make.graphics(
 			((this.game.camera.width / 2) - ((button_padding_x + button_resume_text.width + button_padding_x) / 2)),
 			((this.game.camera.height / 2) - ((button_padding_y + button_resume_text.height + button_padding_y) / 2))
 		);
