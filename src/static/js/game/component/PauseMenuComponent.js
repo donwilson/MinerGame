@@ -1,6 +1,10 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
 	MinerGame.Component.PauseMenu = function(game, custWorld) {
 		this.game = game;

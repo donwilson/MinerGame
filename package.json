@@ -2,6 +2,25 @@
 	"name": "MinerGame",
 	"version": "0.1.0",
 	"main": "src/electron.js",
+	"license": "Proprietary",
+	"repository": {
+		"type": "git",
+		"url": "https://donwilson@github.com/donwilson/MinerGame.git"
+	},
+	"keywords": [
+		"2d",
+		"HTML5",
+		"WebGL",
+		"canvas",
+		"game",
+		"javascript",
+		"physics",
+		"tweens",
+		"phaser",
+		"sandbox",
+		"adventure",
+		"crafting"
+	],
 	"dependencies": {
 		"electron-reload": "^1.2.2"
 	}

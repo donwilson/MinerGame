@@ -1,6 +1,10 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
 	MinerGame.Component.WorldGenerator = function(game, width, height, max_sky) {
 		this.game = game;
@@ -72,6 +76,10 @@
 	
 	MinerGame.Component.WorldGenerator.prototype.getTiles = function() {
 		return this.tiles;
+	};
+	
+	MinerGame.Component.WorldGenerator.prototype.getObjects = function() {
+		return this.objects;
 	};
 	
 	MinerGame.Component.WorldGenerator.prototype.getTopSpawnablePoints = function() {

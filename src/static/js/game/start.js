@@ -1,5 +1,9 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
 	
 	MinerGame.Game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO);
 	

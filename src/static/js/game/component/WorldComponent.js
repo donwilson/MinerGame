@@ -1,6 +1,10 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
 	MinerGame.Component.World = function(game, desired_character, num_tiles_x, num_tiles_y, max_sky) {
 		this.game = game;
@@ -10,6 +14,7 @@
 		this.background = null;
 		
 		this.tiles = [];
+		this.objects = [];
 		this.width = num_tiles_x || 100;
 		this.height = num_tiles_y || 250;
 		this.height_sky = max_sky || 30;
@@ -38,6 +43,7 @@
 		// create world
 		let world_generator = new MinerGame.Component.WorldGenerator(this.game, this.width, this.height, this.height_sky);
 		world_generator.create();
+		this.objects = world_generator.getObjects();
 		
 		// apply generated world
 		this.applyRawTiles(world_generator.getTiles());

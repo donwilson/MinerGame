@@ -1,43 +1,158 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Component = window.MinerGame.Component || (window.MinerGame.Component = {});
 	
+	/**
+	 * Backpack that stores tools and items collected from world
+	 * 
+	 * @class MinerGame.Component.Backpack
+	 * @constructor
+	 * @extends Phaser.Component
+	 * @param {MinerGame.Entity.Player} player    Player entity
+	 * @param {Phaser.Game} game      Phaser game
+	 * @param {MinerGame.Component.WorldComponent} custWorld World instance
+	 */
 	MinerGame.Component.Backpack = function(player, game, custWorld) {
+		/**
+		 * @property {MinerGame.Entity.Player} player - A Player instance
+		 */
 		this.player = player;
+		
+		/**
+		 * @property {Phaser.Game} game - Phaser game instance
+		 */
 		this.game = game;
+		
+		/**
+		 * @property {MinerGame.Component.World} custWorld - World instance
+		 */
 		this.custWorld = custWorld;
 		
-		this.bounds = null;
-		
+		/**
+		 * @property {Object[]} inventory - Backpack inventory slots
+		 * @property {String} inventory[].item_name - Key from MinerGame.Data.tile_types
+		 * @property {Number} inventory[].quantity - Quantity in this inventory slot
+		 * @property {String} inventory[].type - Type of item (tile, tool, ...)
+		 */
 		this.inventory = [];
 		
+		/**
+		 * @property {Array<Phaser.Sprite>} Sprites drawn in backpack
+		 */
 		this.box_slots = [];
 		
+		/**
+		 * @property {Number} num_bottom_slots - Number of backpack slots at bottom
+		 * @default
+		 */
 		this.num_bottom_slots = 8;
+		
+		/**
+		 * @property {Number} selected_slot - Current selected slot in backpack
+		 * @default
+		 */
 		this.selected_slot = 0;
 		
+		/**
+		 * @property {Phaser.Rectangle} backpack_rect - Rectangle of backpack graphic
+		 */
 		this.backpack_rect = null;
 		
-		// settings
-		this.box_corner_radius = 6;   // radius of box corners
-		this.box_margin = 16;   // margin from side of game
-		this.box_padding = 8;   // padding from box to box items
-		this.box_slot_padding = 6;   // padding from box slot container to sprite
-		this.box_slot_spacing = 8;   // space between each box
+		/**
+		 * @property {Phaser.Graphics} box_graphic - Container graphics for backpack
+		 */
+		this.box_graphic = null;
 		
+		/**
+		 * @property {Number} box_margin - Margin from side of screen
+		 * @default
+		 */
+		this.box_margin = 16;   // margin from side of game
+		
+		/**
+		 * @property {Number} box_padding - padding from box to box items
+		 * @default
+		 */
+		this.box_padding = 8;
+		
+		/**
+		 * @property {Number} box_slot_padding - padding from box slot container to sprite
+		 * @default
+		 */
+		this.box_slot_padding = 6;
+		
+		/**
+		 * @property {Number} box_slot_spacing - space between each box slot in backpack
+		 * @default
+		 */
+		this.box_slot_spacing = 8;
+		
+		/**
+		 * @property {Number} box_background_color - Background color of backpack
+		 * @default
+		 */
 		this.box_background_color = 0x000000;
+		
+		/**
+		 * @property {Number} box_background_alpha - Alpha applied to background color of backpack
+		 * @default
+		 */
 		this.box_background_alpha = 0.8;
+		
+		/**
+		 * @property {Number} box_slot_background_color - Background color of box slot
+		 * @default
+		 */
 		this.box_slot_background_color = 0x333333;
+		
+		/**
+		 * @property {Number} box_slot_background_alpha - Alpha applied to background color of box slot
+		 * @default
+		 */
 		this.box_slot_background_alpha = 0.5;
+		
+		/**
+		 * @property {Number} box_slot_corner_radius - Radius on the corner of each box slot
+		 * @default
+		 */
 		this.box_slot_corner_radius = 6;
+		
+		/**
+		 * @property {Number} box_slot_selected_background_color - Background color of selected box slot
+		 * @default
+		 */
 		this.box_slot_selected_background_color = 0x333333;
+		
+		/**
+		 * @property {Number} box_slot_selected_border_width - Border size of selected box slot
+		 * @default
+		 */
 		this.box_slot_selected_border_width = 1;
+		
+		/**
+		 * @property {Number} box_slot_selected_border_color - Border color of selected box slot
+		 * @default
+		 */
 		this.box_slot_selected_border_color = 0xFFFC00;
+		
+		/**
+		 * @property {Number} box_slot_selected_border_alpha - Alpha applied to border of selected box slot
+		 * @default
+		 */
 		this.box_slot_selected_border_alpha = 0.5;
+		
 		
 		this.create();
 		
-		// keypress callbacks
+		/**
+		 * Mapped array of Phaser.Key instances for keys 1-8, used to make specific box slot active
+		 *
+		 * @type {Object<Phaser.Key>}
+		 */
 		this.keys = this.game.input.keyboard.addKeys({
 			'one': Phaser.Keyboard.ONE,
 			'two': Phaser.Keyboard.TWO,
@@ -53,6 +168,9 @@
 	MinerGame.Component.Backpack.prototype = Object.create(Phaser.Component.prototype);
 	MinerGame.Component.Backpack.prototype.constructor = MinerGame.Component.Backpack;
 	
+	/**
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.create = function() {
 		this.setBackpackRect();
 		
@@ -100,6 +218,9 @@
 		this.addTool("wood_axe");
 	};
 	
+	/**
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.update = function() {
 		// change active item slots based on pressing keys 1-8
 		if(this.keys.one.isDown) {
@@ -121,6 +242,9 @@
 		}
 	};
 	
+	/**
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.draw = function() {
 		// clear any existing drawing
 		this.box_graphic.clear();
@@ -158,15 +282,25 @@
 		}
 	};
 	
+	/**
+	 * Add an item by name to backpack
+	 *
+	 * @method
+	 * 
+	 * @param {string} item_name    Key from MinerGame.Data.tile_types
+	 * @param {number} add_quantity How many to add (defaults to 1
+	 * 
+	 * @return {boolean}
+	 */
 	MinerGame.Component.Backpack.prototype.addItem = function(item_name, add_quantity) {
 		if(!item_name || ("air" === item_name)) {
-			return;
+			return false;
 		}
 		
 		if(_.isUndefined(MinerGame.Data.tile_types[ item_name ])) {
 			console.error("Unknown tile_type '"+ item_name +"'");
 			
-			return;
+			return false;
 		}
 		
 		let tile_data = MinerGame.Data.tile_types[ item_name ];
@@ -215,8 +349,20 @@
 		}
 		
 		this.updateItemBoxes();
+		
+		return true;
 	};
 	
+	/**
+	 * Add a tool by name to backpack
+	 *
+	 * @method
+	 * 
+	 * @param {string} item_name    Key from MinerGame.Data.tile_types
+	 * @param {number} add_quantity How many to add (defaults to 1
+	 * 
+	 * @return {boolean}
+	 */
 	MinerGame.Component.Backpack.prototype.addTool = function(item_name, add_quantity) {
 		if(!MinerGame.Data.tile_types[ item_name ]) {
 			return false;
@@ -257,8 +403,17 @@
 		}
 		
 		this.updateItemBoxes();
+		
+		return true;
 	};
 	
+	/**
+	 * Empty out a specific box slot
+	 *
+	 * @method
+	 * 
+	 * @param  {number} slot Box slot number
+	 */
 	MinerGame.Component.Backpack.prototype.emptySlot = function(slot) {
 		this.inventory[ slot ] = {
 			'item_name': "air",
@@ -272,15 +427,24 @@
 		}
 	};
 	
+	/**
+	 * Trigger a box slot as used
+	 *
+	 * @method
+	 * 
+	 * @param  {number} slot Box slot number
+	 * 
+	 * @return {boolean}
+	 */
 	MinerGame.Component.Backpack.prototype.useInventory = function(slot) {
 		if(!this.inventory[ slot ]) {
-			return;
+			return false;
 		}
 		
 		if("tool" === this.inventory[ slot ].type) {
 			// future...
 			
-			return;
+			return true;
 		} else if("tile" === this.inventory[ slot ].type) {
 			this.inventory[ slot ].quantity -= 1;
 			
@@ -291,10 +455,20 @@
 			
 			this.updateItemBoxes();
 			
-			return;
+			return true;
 		}
 	};
 	
+	/**
+	 * Use selected box slot on specific world tile
+	 * 
+	 * @method
+	 * 
+	 * @param  {number} tileX World tile X
+	 * @param  {number} tileY World tile Y
+	 * 
+	 * @return {boolean}
+	 */
 	MinerGame.Component.Backpack.prototype.useSelectedItemSlot = function(tileX, tileY) {
 		//console.log("useSelectedItemSlot: "+ tileX +", "+ tileY);
 		
@@ -303,11 +477,11 @@
 		let activePointerTileY = this.custWorld.layer.getTileY(this.game.input.activePointer.worldY);
 		
 		if((activePointerTileX != tileX) || (activePointerTileY != tileY)) {
-			return;
+			return false;
 		}
 		
 		if(!this.inventory[ this.selected_slot ]) {
-			return;
+			return false;
 		}
 		
 		let selected_inventory_item = this.inventory[ this.selected_slot ];
@@ -323,7 +497,7 @@
 		if("tool" === item_holding.type) {
 			// use tool
 			if("air" === tile_hit.type) {
-				return;
+				return false;
 			}
 			
 			if(item_holding && item_holding.properties && item_holding.properties.effective_tiles && item_holding.properties.effective_tiles.length && (-1 !== _.indexOf(item_holding.properties.effective_tiles, tile_hit.type))) {
@@ -333,7 +507,7 @@
 				
 				if(!tile_hit.strength) {
 					// impossible to break
-					return;
+					return false;
 				}
 				
 				if(true === this.custWorld.hitTile(tileX, tileY, item_holding.properties.strength)) {
@@ -359,17 +533,19 @@
 					//this.useInventory(this.selected_slot);
 					this.updateItemBoxes();
 					//this.player.positionTool();
+					
+					return true;
 				}
 			}
 			
-			return;
+			return false;
 		}
 		
 		if("tile" === item_holding.type) {
 			// place a tile
 			if("air" !== tile_hit.type) {
 				// cant overwrite non-air
-				return;
+				return false;
 			}
 			
 			this.useInventory(this.selected_slot);
@@ -377,10 +553,17 @@
 			
 			this.player.positionTool();
 			
-			return;
+			return true;
 		}
+		
+		return false;
 	};
 	
+	/**
+	 * Update box slot sprite/text values
+	 * 
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.updateItemBoxes = function() {
 		for(let i = 0; i < this.num_bottom_slots; i++) {
 			let quantity = 0;
@@ -412,6 +595,11 @@
 		}
 	};
 	
+	/**
+	 * Calculate the backpack draw rectangle
+	 * 
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.setBackpackRect = function() {
 		let width = (this.box_padding + ((this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding) * this.num_bottom_slots) + (this.box_slot_spacing * Math.max(0, (this.num_bottom_slots - 1))) + this.box_padding);
 		let height = (this.box_padding + this.box_slot_padding + TILE_HEIGHT + this.box_slot_padding + this.box_padding);
@@ -422,10 +610,17 @@
 			width,
 			height
 		);
-		
-		this.bounds = this.backpack_rect;
 	};
 	
+	/**
+	 * Return a Rectangle of the specified box slot, position relative to backpack
+	 * 
+	 * @method
+	 * 
+	 * @param  {number} i Box slot number
+	 *
+	 * @return {Phaser.Rectangle}   Rectangle relative to top left of backpack
+	 */
 	MinerGame.Component.Backpack.prototype.getItemBoxRelativeRect = function(i) {
 		// i = item box 0-X
 		// returns rect relative to top left of backpack
@@ -437,6 +632,13 @@
 		);
 	};
 	
+	/**
+	 * Mark box slot as active
+	 *
+	 * @method
+	 * 
+	 * @param {number} index Box slot number
+	 */
 	MinerGame.Component.Backpack.prototype.setActiveItemSlot = function(index) {
 		this.selected_slot = index;
 		
@@ -452,11 +654,25 @@
 		this.player.positionTool();
 	};
 	
+	/**
+	 * Get selected box slot
+	 *
+	 * @method
+	 * 
+	 * @return {Object|null}
+	 */
 	MinerGame.Component.Backpack.prototype.getActiveItem = function() {
 		// return the currently selected item in backpack
 		return this.inventory[ this.selected_slot ] || null;
 	};
 	
+	/**
+	 * Attempt to capture click
+	 * 
+	 * @method
+	 * 
+	 * @return {boolean} True if backpack is able to capture click (inside backpack), otherwise false
+	 */
 	MinerGame.Component.Backpack.prototype.captureClick = function() {
 		let cameraX = (this.game.input.activePointer.worldX - this.game.camera.view.x);
 		let cameraY = (this.game.input.activePointer.worldY - this.game.camera.view.y);
@@ -487,6 +703,11 @@
 		return true;
 	};
 	
+	/**
+	 * Process a mouse wheel event. Sets next/previous box slot as active when possible
+	 * 
+	 * @method
+	 */
 	MinerGame.Component.Backpack.prototype.handleMouseWheel = function() {
 		let new_selected_slot = this.selected_slot;
 		
@@ -510,6 +731,11 @@
 		this.setActiveItemSlot(new_selected_slot);
 	};
 	
+	/**
+	 * Key down event
+	 *
+	 * @param  {object} event Mouse event
+	 */
 	MinerGame.Component.Backpack.prototype.handleKeyDown = function(event) {
 		console.log("Backpack.handleKeyDown.event = ", event);
 		

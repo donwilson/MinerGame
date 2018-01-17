@@ -29,7 +29,8 @@
 				"*.*CST"
 			],
 			"folder_exclude_patterns": [
-				"src"
+				"src",
+				"node_modules"
 			]
 		}
 	]

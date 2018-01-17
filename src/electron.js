@@ -30,7 +30,7 @@
 		}));
 		
 		// Open the DevTools.
-		//win.webContents.openDevTools();
+		win.webContents.openDevTools();
 		
 		// hide window menu
 		win.setMenu(null);

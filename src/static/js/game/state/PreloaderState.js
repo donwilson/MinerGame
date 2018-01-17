@@ -1,6 +1,7 @@
-	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.State = window.MinerGame.State || (window.MinerGame.State = {});
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
 	MinerGame.State.Preloader = function() {
 		Phaser.State.call(this);

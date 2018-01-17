@@ -1,6 +1,10 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Entity = window.MinerGame.Entity || (window.MinerGame.Entity = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Entity = window.MinerGame.Entity || (window.MinerGame.Entity = {});
 	
 	MinerGame.Entity.Player = function(game, custWorld, selected_character) {
 		this.game = game;

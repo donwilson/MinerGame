@@ -1,7 +1,14 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.State = window.MinerGame.State || (window.MinerGame.State = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.State = window.MinerGame.State || (window.MinerGame.State = {});
 	
+	/**
+	 * Game State
+	 */
 	MinerGame.State.Game = function() {
 		Phaser.State.call(this);
 		
@@ -15,6 +22,13 @@
 	MinerGame.State.Game.prototype = Object.create(Phaser.State.prototype);
 	MinerGame.State.Game.prototype.constructor = MinerGame.State.Game;
 	
+	/**
+	 * Initialize game state
+	 *
+	 * @param  {string} selected_character Character key of what is selected from Main Menu
+	 *
+	 * @return {void}
+	 */
 	MinerGame.State.Game.prototype.init = function(selected_character) {
 		// set stage bg
 		this.game.stage.backgroundColor = "#10151d";
@@ -25,6 +39,11 @@
 		}
 	};
 	
+	/**
+	 * Game State create
+	 *
+	 * @return {void} 
+	 */
 	MinerGame.State.Game.prototype.create = function() {
 		//this.game.plugins.add(Phaser.Plugin.AdvancedTiming, {mode: 'graph'});
 		
@@ -36,6 +55,11 @@
 		this.pause_menu = new MinerGame.Component.PauseMenu(this.game, this.custWorld);
 	};
 	
+	/**
+	 * Game State update
+	 *
+	 * @return {void} 
+	 */
 	MinerGame.State.Game.prototype.update = function() {
 		if(this.pause_menu.isPaused()) {
 			// pause game logic during pause
@@ -47,6 +71,11 @@
 		this.custWorld.update();
 	};
 	
+	/**
+	 * Game State render
+	 *
+	 * @return {void} 
+	 */
 	MinerGame.State.Game.prototype.render = function() {
 		this.custWorld.render();
 	};

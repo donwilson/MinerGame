@@ -1,6 +1,10 @@
+/**
+* @author       Don Wilson <donwilson@gmail.com>
+* @copyright    2017 Pyxol
+*/
 	
-	var MinerGame = window.MinerGame || (window.MinerGame = {});
-	MinerGame.Data = window.MinerGame.Data || (window.MinerGame.Data = {});
+	//var MinerGame = window.MinerGame || (window.MinerGame = {});
+	//MinerGame.Data = window.MinerGame.Data || (window.MinerGame.Data = {});
 	
 	MinerGame.Data.playable_characters = {
 		'boy': {
